@@ -13,16 +13,15 @@ npm install --save react-panel-search
 ## Usage
 
 ```tsx
-import React, { Component } from 'react'
+import React from 'react'
+import PanelSearch, {Datum} from 'react-panel-search'
 
-import MyComponent from 'react-panel-search'
-import 'react-panel-search/dist/index.css'
-
-class Example extends Component {
-  render() {
-    return <MyComponent />
-  }
+const App = () => {
+  return <PanelSearch data={data} />
 }
+
+export default App
+
 ```
 
 ## License
