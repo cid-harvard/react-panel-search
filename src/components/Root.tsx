@@ -1,27 +1,59 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Level, Datum} from '../'
 import StandardSearch from './StandardSearch';
 import sortBy from 'lodash/sortBy';
+import usePrevious from 'react-use-previous-hook';
 
 interface Props {
   levels: Level[];
+  onSelect: undefined | ((value: Datum | null) => void);
+  selectedValue: Datum | null;
 }
 
 interface State {
   level: Datum['level'];
   parent: Datum['parent_id'];
+  selected: Datum | null;
+  searchQuery: string;
 }
 
-export default ({levels}: Props) => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
+export default ({levels, onSelect, selectedValue}: Props) => {
+  const previousSelectedValue = usePrevious(selectedValue);
+
   const [state, setState] = useState<State>({
     level: levels[0].level,
     parent: null,
+    selected: null,
+    searchQuery: '',
   });
+
+  const updateState = (newState: State) => {
+    setState(newState)
+  }
+
+  const clearSearch = () => {
+    updateState({...state, selected: null, searchQuery: ''})
+    if (onSelect) {
+      onSelect(null);
+    }
+  }
+
+  const selectDatum = (value: Datum) => {
+    updateState({...state, selected: value})
+    if (onSelect) {
+      onSelect(value);
+    }
+  }
+
+  useEffect(() => {
+    if (previousSelectedValue && !selectedValue) {
+      updateState({...state, selected: null, searchQuery: ''})
+    }
+  }, [selectedValue, previousSelectedValue])
 
   let listOutput: React.ReactElement<any>;
 
-  if (searchQuery.length) {
+  if (state.searchQuery.length) {
     // Loop through each filtered level to make element list
     // For each parent, find the children in the next level down if not the last level
     // For each level, check if a parent exists, if so skip it
@@ -32,7 +64,7 @@ export default ({levels}: Props) => {
       sortBy(levels[index].data, ['name']).forEach((child) => {
         if (child.parent_id === parent &&
             !renderedIds.includes(child.id) &&
-            child.title.toLowerCase().includes(searchQuery.toLowerCase())
+            child.title.toLowerCase().includes(state.searchQuery.toLowerCase())
           ) {
           renderedIds.push(child.id);
           let childElms: React.ReactElement<any>[] | null;
@@ -46,11 +78,14 @@ export default ({levels}: Props) => {
               {childElms}
             </ul>
           ) : null;
+          const onSearch = () => {
+            selectDatum(child)
+          }
           elms.push(
             <li
               key={'search-' + child.title + child.id}
             >
-              {child.title}
+              <button onClick={onSearch}>{child.title}</button>
               {childList}
             </li>
           );
@@ -60,7 +95,7 @@ export default ({levels}: Props) => {
     }
     levels.forEach(({data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
-        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(state.searchQuery.toLowerCase())) {
           renderedIds.push(datum.id);
           let childElms: React.ReactElement<any>[] | null;
           if (levels[i + 1] && levels[i + 1].data) {
@@ -73,9 +108,12 @@ export default ({levels}: Props) => {
               {childElms}
             </ul>
           ) : null;
+          const onSearch = () => {
+            selectDatum(datum)
+          }
           filteredElms.push(
             <li key={'search-' + datum.title + datum.id}>
-              {datum.title}
+              <button onClick={onSearch}>{datum.title}</button>
               {childList}
             </li>
           );
@@ -91,18 +129,18 @@ export default ({levels}: Props) => {
     const targetIndex = levels.findIndex(({level}) => level === state.level);
     const listItems = levels[targetIndex].data.filter(({parent_id}) => parent_id === state.parent).map(d => {
       const onSearch = () => {
-        console.log({search: d.title})
+        selectDatum(d)
       }
       const continueButton = targetIndex !== levels.length - 1 ? (
         <button
-          onClick={() => setState({level: levels[targetIndex + 1].level, parent: d.id})}
+          onClick={() => updateState({...state, level: levels[targetIndex + 1].level, parent: d.id})}
         >
           {'>'}
         </button>
       ) : null;
       return (
-        <li onClick={onSearch} key={d.id}>
-          {d.title} {continueButton}
+        <li key={d.id}>
+          <button onClick={onSearch}>{d.title}</button> {continueButton}
         </li>
       );
     });
@@ -118,7 +156,7 @@ export default ({levels}: Props) => {
     ) : (
       <React.Fragment>
         <button
-          onClick={() => setState({level: levels[targetIndex - 1].level, parent: parentDatum.parent_id})}
+          onClick={() => updateState({...state, level: levels[targetIndex - 1].level, parent: parentDatum.parent_id})}
         >
           {'<'}
         </button>
@@ -139,14 +177,15 @@ export default ({levels}: Props) => {
     );
   }
 
-
   return (
     <React.Fragment>
       <div>
         <StandardSearch
-          placeholder={'Search'}
-          setSearchQuery={val => setSearchQuery(val)}
-          initialQuery={searchQuery}
+          placeholder={state.selected ? state.selected.title : 'Search'}
+          setSearchQuery={val => updateState({...state, searchQuery: val, level: levels[0].level, parent: null})}
+          initialQuery={''}
+          onClear={clearSearch}
+          hasSelection={state.selected ? true : false}
         />
       </div>
       {listOutput}

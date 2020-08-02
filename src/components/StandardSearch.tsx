@@ -1,15 +1,28 @@
 import { debounce } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
+import usePrevious from 'react-use-previous-hook';
 
 const SearchContainer = styled.label`
   position: relative;
   display: flex;
 `;
 
-const SearchBar = styled.input`
+const SearchBar = styled.input<{$hasSelection: boolean}>`
   width: 100%;
   box-sizing: border-box;
+
+  ${({$hasSelection}) => $hasSelection ? (
+    `&::placeholder {
+      color: rgb(0, 0, 0);
+    }`
+  ) : ''}
+
+  &:focus {
+    &::placeholder {
+      color: rgb(255, 255, 255);
+    }
+  }
 `;
 
 const ClearButton = styled.button`
@@ -34,11 +47,15 @@ interface Props {
   placeholder: string;
   setSearchQuery: (value: string) => void;
   initialQuery: string;
+  onClear: () => void;
+  hasSelection: boolean;
   type?: string;
 }
 
 const StandardSearch = (props: Props) => {
-  const { placeholder, setSearchQuery, initialQuery, type } = props;
+  const { placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection } = props;
+
+  const previousPlaceholder = usePrevious(placeholder);
 
   const searchEl = useRef<HTMLInputElement | null>(null);
   const clearEl = useRef<HTMLButtonElement | null>(null);
@@ -47,7 +64,7 @@ const StandardSearch = (props: Props) => {
     if (searchEl !== null && searchEl.current !== null) {
       setSearchQuery(searchEl.current.value);
       if (clearEl && clearEl.current) {
-        clearEl.current.style.display = searchEl.current.value.length ? 'block' : 'none';
+        clearEl.current.style.display = searchEl.current.value.length || hasSelection ? 'block' : 'none';
       }
     }
   }, 400);
@@ -57,6 +74,7 @@ const StandardSearch = (props: Props) => {
       searchEl.current.value = '';
       searchEl.current.focus();
       setSearchQuery(searchEl.current.value);
+      onClear();
     }
     if (clearEl && clearEl.current) {
       clearEl.current.style.display = 'none';
@@ -70,10 +88,13 @@ const StandardSearch = (props: Props) => {
         node.value = initialQuery;
       }
       if (clearEl && clearEl.current) {
-        clearEl.current.style.display = node.value.length ? 'block' : 'none';
+        clearEl.current.style.display = node.value.length || hasSelection ? 'block' : 'none';
+      }
+      if (node.value && hasSelection && previousPlaceholder !== placeholder) {
+        node.value = '';
       }
     }
-  }, [searchEl, initialQuery]);
+  }, [searchEl, initialQuery, hasSelection, placeholder, previousPlaceholder]);
 
   return (
     <SearchContainer>
@@ -83,6 +104,7 @@ const StandardSearch = (props: Props) => {
         placeholder={placeholder}
         onChange={onChange}
         autoComplete={'off'}
+        $hasSelection={hasSelection}
       />
       <ClearButton
         ref={clearEl}

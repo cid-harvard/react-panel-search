@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 
 import PanelSearch, {Datum} from 'react-panel-search'
 import 'react-panel-search/dist/index.css'
@@ -19,6 +19,8 @@ interface NaicsDatum {
 const rawData: NaicsDatum[] = JSON.parse(raw('./naics_data.json'));
 
 const App = () => {
+  const [selectedValue, setSelectedValue] = useState<Datum | null>(null);
+
   const data: Datum[] = rawData.map(datum => {
     return {
       id: datum.naics_id,
@@ -28,7 +30,19 @@ const App = () => {
     }
   })
 
-  return <PanelSearch data={data} />
+  const selectedText = selectedValue ? 'Selected: ' + selectedValue.title : 'Nothing selected';
+  const clearButton  = selectedValue ? <button onClick={() => setSelectedValue(null)}>Clear</button> : null;
+
+  return (
+    <>
+      <h1>{selectedText} {clearButton}</h1>
+      <PanelSearch
+        data={data}
+        onSelect={setSelectedValue}
+        selectedValue={selectedValue}
+      />
+    </>
+  );
 }
 
 export default App
