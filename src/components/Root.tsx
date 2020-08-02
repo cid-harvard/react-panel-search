@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Level, Datum} from '../'
 import StandardSearch from './StandardSearch';
+import sortBy from 'lodash/sortBy';
 
 interface Props {
   levels: Level[];
@@ -25,11 +26,58 @@ export default ({levels}: Props) => {
     // For each parent, find the children in the next level down if not the last level
     // For each level, check if a parent exists, if so skip it
     const filteredElms: React.ReactElement<any>[] = [];
-    levels.forEach(({data}) => {
-      data.forEach((datum) => {
-        if (datum.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+    const renderedIds: Array<string | number> = [];
+    const getChildren = (index: number, parent: Datum['parent_id']) => {
+      const elms: React.ReactElement<any>[] = [];
+      sortBy(levels[index].data, ['name']).forEach((child) => {
+        if (child.parent_id === parent &&
+            !renderedIds.includes(child.id) &&
+            child.title.toLowerCase().includes(searchQuery.toLowerCase())
+          ) {
+          renderedIds.push(child.id);
+          let childElms: React.ReactElement<any>[] | null;
+          if (levels[index + 1] && levels[index + 1].data) {
+            childElms = getChildren(index + 1, child.id);
+          } else {
+            childElms = null;
+          }
+          const childList = childElms && childElms.length ? (
+            <ul>
+              {childElms}
+            </ul>
+          ) : null;
+          elms.push(
+            <li
+              key={'search-' + child.title + child.id}
+            >
+              {child.title}
+              {childList}
+            </li>
+          );
+        }
+      });
+      return elms;
+    }
+    levels.forEach(({data}, i) => {
+      sortBy(data, ['name']).forEach((datum) => {
+        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+          renderedIds.push(datum.id);
+          let childElms: React.ReactElement<any>[] | null;
+          if (levels[i + 1] && levels[i + 1].data) {
+            childElms = getChildren(i + 1, datum.id);
+          } else {
+            childElms = null;
+          }
+          const childList = childElms && childElms.length ? (
+            <ul>
+              {childElms}
+            </ul>
+          ) : null;
           filteredElms.push(
-            <li key={'search-' + datum.title + datum.id}>{datum.title}</li>
+            <li key={'search-' + datum.title + datum.id}>
+              {datum.title}
+              {childList}
+            </li>
           );
         }
       });

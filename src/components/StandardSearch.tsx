@@ -55,6 +55,7 @@ const StandardSearch = (props: Props) => {
   const clearSearch = () => {
     if (searchEl !== null && searchEl.current !== null) {
       searchEl.current.value = '';
+      searchEl.current.focus();
       setSearchQuery(searchEl.current.value);
     }
     if (clearEl && clearEl.current) {
