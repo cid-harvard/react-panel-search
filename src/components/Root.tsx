@@ -23,7 +23,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
   const [state, setState] = useState<State>({
     level: levels[0].level,
     parent: null,
-    selected: null,
+    selected: selectedValue,
     searchQuery: '',
   });
 
