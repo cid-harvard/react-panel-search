@@ -75,7 +75,7 @@ const App = () => {
       <SearchContainer>
         <PanelSearch
           data={data}
-          topLevelTitle={'Industries'}
+          topLevelTitle={'All Industries'}
           onSelect={setSelectedValue}
           selectedValue={selectedValue}
         />

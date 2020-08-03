@@ -36,7 +36,6 @@ const ClearButton = styled.button`
   top: 2px;
   bottom: 2px;
   right: 2px;
-  padding: 1rem;
   line-height: 0;
   font-size: 1.2rem;
   padding: 0.4rem;

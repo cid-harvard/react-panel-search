@@ -9,6 +9,29 @@ const Container = styled.div`
   position: relative;
   width: 100%;
   max-width: 400px;
+  color: #333;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    li {
+      padding-left: 1rem;
+
+      button:before {
+        content: '↳';
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  .react-panel-search-highlighted-item {
+    background-color: #f3f3f3;
+  }
+
 `;
 
 const Backdrop = styled.div`
@@ -32,8 +55,81 @@ const SearchResults = styled.div`
   max-height: 300px;
   overflow: auto;
   background-color: #fff;
+
+  ul:hover {
+    .react-panel-search-highlighted-item:not(:hover) {
+      background-color: #fff;
+    }
+  }
 `;
 
+const Title = styled.div`
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  display: grid;
+  grid-column-gap: 0.5rem;
+  grid-template-columns: auto 1fr;
+  border-bottom: solid 2px #749aca;
+  font-size: 0.85rem;
+`;
+
+const NavButton = styled.button`
+  line-height: 1;
+  font-size: 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  color: #fff;
+  background-color: #749aca;
+  border: none;
+  display: flex;
+  justify-content: center;
+  height: 1rem;
+  width: 1rem;
+  margin: auto;
+
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const NextButton = styled(NavButton)`
+  grid-row: 1;
+  grid-column: 2;
+  position: relative;
+  margin-right: 1rem;
+`;
+
+const PanelItem = styled.li`
+  display: grid;
+  grid-template-columns: 1fr auto;
+`;
+
+const ButtonBase = styled.button`
+  padding: 1rem 0.75rem;
+  font-size: 0.75rem;
+  background-color: #fff;
+  border: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding-right: 1.5rem;
+  box-sizing: border-box;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f3f3f3;
+  }
+`;
+
+const PanelButton = styled(ButtonBase)`
+  grid-row: 1;
+  grid-column: 1 / 3;
+`;
+
+const SearchButton = styled(ButtonBase)`
+  padding: 0.6rem 0.75rem
+`;
 
 interface Props {
   levels: Level[];
@@ -98,7 +194,6 @@ export default (props: Props) => {
     if (node) {
       const liElms = Array.from(node.querySelectorAll<HTMLButtonElement>('li .react-panel-search-list-item'));
       for (let li of liElms) {
-        li.style.outline = '';
         li.classList.remove('react-panel-search-highlighted-item')
       }
       if (liElms.length) {
@@ -112,7 +207,6 @@ export default (props: Props) => {
         } else {
           index = state.highlightedIndex;
         }
-        liElms[index].style.outline = 'solid 1px blue';
         liElms[index].classList.add('react-panel-search-highlighted-item');
         const highlightedTop = liElms[index].offsetTop;
         const highlightedBottom = highlightedTop + liElms[index].offsetHeight;
@@ -162,7 +256,7 @@ export default (props: Props) => {
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
             <span>{child.title}</span>
           ) : (
-            <button onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</button>
+            <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</SearchButton>
           )
           elms.push(
             <li
@@ -197,7 +291,7 @@ export default (props: Props) => {
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(level) ? (
             <span>{datum.title}</span>
           ) : (
-            <button onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</button>
+            <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</SearchButton>
           )
           filteredElms.push(
             <li key={'search-' + datum.title + datum.id}>
@@ -230,14 +324,14 @@ export default (props: Props) => {
         }
       }
       const continueButton = targetIndex !== levels.length - 1 ? (
-        <button onClick={onContinue}>
+        <NextButton onClick={onContinue}>
           {'>'}
-        </button>
+        </NextButton>
       ) : null;
       return (
-        <li key={d.id}>
-          <button onClick={onSearch} className={'react-panel-search-list-item'}>{d.title}</button> {continueButton}
-        </li>
+        <PanelItem key={d.id}>
+          <PanelButton onClick={onSearch} className={'react-panel-search-list-item'}>{d.title}</PanelButton> {continueButton}
+        </PanelItem>
       );
     });
 
@@ -248,7 +342,7 @@ export default (props: Props) => {
 
     const breadCrumb = !parentDatum ? titleText : (
       <React.Fragment>
-        <button
+        <NavButton
           onClick={() => updateState({
             ...state,
             level: levels[targetIndex - 1].level,
@@ -257,7 +351,7 @@ export default (props: Props) => {
           })}
         >
           {'<'}
-        </button>
+        </NavButton>
         <span>
           {parentDatum.title}
         </span>
@@ -265,9 +359,9 @@ export default (props: Props) => {
     )
     listOutput = (
       <React.Fragment>
-        <div>
+        <Title>
           {breadCrumb}
-        </div>
+        </Title>
         <ul>
             {listItems}
         </ul>
