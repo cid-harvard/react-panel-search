@@ -3,6 +3,36 @@ import {Level, Datum} from '../'
 import StandardSearch from './StandardSearch';
 import sortBy from 'lodash/sortBy';
 import usePrevious from 'react-use-previous-hook';
+import styled from 'styled-components/macro';
+
+const Container = styled.div`
+  position: relative;
+  max-width: 500px;
+`;
+
+const Backdrop = styled.div`
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+`;
+
+const SearchBar = styled.div`
+  position: relative;
+`;
+
+const SearchResults = styled.div`
+  position: relative;
+  max-height: 300px;
+  overflow: auto;
+  background-color: #fff;
+`;
+
 
 interface Props {
   levels: Level[];
@@ -16,6 +46,7 @@ interface State {
   selected: Datum | null;
   searchQuery: string;
   highlightedIndex: number;
+  isOpen: boolean;
 }
 
 export default ({levels, onSelect, selectedValue}: Props) => {
@@ -27,6 +58,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     selected: selectedValue,
     searchQuery: '',
     highlightedIndex: 0,
+    isOpen: false,
   });
 
   const updateState = (newState: State) => {
@@ -34,14 +66,14 @@ export default ({levels, onSelect, selectedValue}: Props) => {
   }
 
   const clearSearch = () => {
-    updateState({...state, selected: null, searchQuery: '', highlightedIndex: 0})
+    updateState({...state, selected: null, searchQuery: '', highlightedIndex: 0, isOpen: true})
     if (onSelect) {
       onSelect(null);
     }
   }
 
   const selectDatum = (value: Datum) => {
-    updateState({...state, selected: value})
+    updateState({...state, selected: value, isOpen: false})
     if (onSelect) {
       onSelect(value);
     }
@@ -229,10 +261,25 @@ export default ({levels, onSelect, selectedValue}: Props) => {
       }
     }
   }
-  console.log(state.highlightedIndex)
+
+  const backdrop  = state.isOpen ? (
+    <Backdrop
+      onClick={() => updateState({...state, isOpen: false})}
+    />
+  ) : null;
+
+  const searchResults = state.isOpen ? (
+    <SearchResults ref={resultsRef}>
+      {listOutput}
+    </SearchResults>
+  ) : null;
+
   return (
-    <React.Fragment>
-      <div>
+    <Container
+      style={{zIndex: state.isOpen ? 2000 : undefined}}
+    >
+      {backdrop}
+      <SearchBar>
         <StandardSearch
           placeholder={state.selected ? state.selected.title : 'Search'}
           setSearchQuery={val => updateState({
@@ -246,11 +293,10 @@ export default ({levels, onSelect, selectedValue}: Props) => {
           onClear={clearSearch}
           hasSelection={state.selected ? true : false}
           handleKeyDown={handleKeyDown}
+          onFocus={() => updateState({...state, isOpen: true})}
         />
-      </div>
-      <div ref={resultsRef}>
-        {listOutput}
-      </div>
-    </React.Fragment>
+      </SearchBar>
+      {searchResults}
+    </Container>
   );
 }
