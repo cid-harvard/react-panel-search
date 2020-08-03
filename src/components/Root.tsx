@@ -7,7 +7,8 @@ import styled from 'styled-components/macro';
 
 const Container = styled.div`
   position: relative;
-  max-width: 500px;
+  width: 100%;
+  max-width: 400px;
 `;
 
 const Backdrop = styled.div`
@@ -38,6 +39,8 @@ interface Props {
   levels: Level[];
   onSelect: undefined | ((value: Datum | null) => void);
   selectedValue: Datum | null;
+  topLevelTitle: string | undefined;
+  disallowSelectionLevels: undefined | (Level['level'][]);
 }
 
 interface State {
@@ -49,7 +52,10 @@ interface State {
   isOpen: boolean;
 }
 
-export default ({levels, onSelect, selectedValue}: Props) => {
+export default (props: Props) => {
+  const {
+    levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
+  } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
   const [state, setState] = useState<State>({
@@ -153,11 +159,16 @@ export default ({levels, onSelect, selectedValue}: Props) => {
           const onSearch = () => {
             selectDatum(child)
           }
+          const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
+            <span>{child.title}</span>
+          ) : (
+            <button onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</button>
+          )
           elms.push(
             <li
               key={'search-' + child.title + child.id}
             >
-              <button onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</button>
+              {resultElm}
               {childList}
             </li>
           );
@@ -165,7 +176,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
       });
       return elms;
     }
-    levels.forEach(({data}, i) => {
+    levels.forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
         if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(state.searchQuery.toLowerCase())) {
           renderedIds.push(datum.id);
@@ -183,9 +194,14 @@ export default ({levels, onSelect, selectedValue}: Props) => {
           const onSearch = () => {
             selectDatum(datum)
           }
+          const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(level) ? (
+            <span>{datum.title}</span>
+          ) : (
+            <button onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</button>
+          )
           filteredElms.push(
             <li key={'search-' + datum.title + datum.id}>
-              <button onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</button>
+              {resultElm}
               {childList}
             </li>
           );
@@ -200,16 +216,21 @@ export default ({levels, onSelect, selectedValue}: Props) => {
   } else {
     const targetIndex = levels.findIndex(({level}) => level === state.level);
     const listItems = levels[targetIndex].data.filter(({parent_id}) => parent_id === state.parent).map(d => {
+      const onContinue = () => {
+        updateState({
+          ...state, level: levels[targetIndex + 1].level, parent: d.id, 
+          highlightedIndex: 0,
+        })
+      }
       const onSearch = () => {
-        selectDatum(d)
+        if (disallowSelectionLevels && disallowSelectionLevels.includes(levels[targetIndex].level)) {
+          onContinue();
+        } else {
+          selectDatum(d)
+        }
       }
       const continueButton = targetIndex !== levels.length - 1 ? (
-        <button
-          onClick={() => updateState({
-            ...state, level: levels[targetIndex + 1].level, parent: d.id, 
-            highlightedIndex: 0,
-          })}
-        >
+        <button onClick={onContinue}>
           {'>'}
         </button>
       ) : null;
@@ -223,12 +244,9 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     const parentDatum = parent === null || targetIndex === 0
       ? undefined : levels[targetIndex - 1].data.find(({id}) => id === state.parent);
 
-    const breadCrumb = !parentDatum ? (
-      <span
-      >
-        Industries
-      </span>
-    ) : (
+    const titleText = topLevelTitle ? <span>{topLevelTitle}</span> : null;
+
+    const breadCrumb = !parentDatum ? titleText : (
       <React.Fragment>
         <button
           onClick={() => updateState({

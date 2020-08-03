@@ -34,11 +34,16 @@ export interface Level {
 
 interface Props {
   data: Datum[];
+  topLevelTitle?: string;
   onSelect?: (value: Datum | null) => void;
   selectedValue?: Datum | null;
+  disallowSelectionLevels?: Level['level'][];
 }
 
-const PanelSearch = ({ data, onSelect, selectedValue }: Props) => {
+const PanelSearch = (props: Props) => {
+  const {
+    data, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
+  } = props;
   const levels: Level[] = [];
   data.forEach(datum => {
     let targetIndex = levels.findIndex(({level}) => level === datum.level);
@@ -59,6 +64,8 @@ const PanelSearch = ({ data, onSelect, selectedValue }: Props) => {
           levels={sortedLevels}
           onSelect={onSelect}
           selectedValue={selectedValue ? selectedValue : null}
+          topLevelTitle={topLevelTitle}
+          disallowSelectionLevels={disallowSelectionLevels}
         />
       </div>
     );

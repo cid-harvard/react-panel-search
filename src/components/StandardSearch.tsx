@@ -10,7 +10,13 @@ const SearchContainer = styled.label`
 
 const SearchBar = styled.input<{$hasSelection: boolean}>`
   width: 100%;
+  max-width: 400px;
   box-sizing: border-box;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border: solid 1px #dfdfdf;
+  font-size: 1.2rem;
+  font-weight: 300;
 
   ${({$hasSelection}) => $hasSelection ? (
     `&::placeholder {
@@ -27,19 +33,27 @@ const SearchBar = styled.input<{$hasSelection: boolean}>`
 
 const ClearButton = styled.button`
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
+  top: 2px;
+  bottom: 2px;
+  right: 2px;
   padding: 1rem;
   line-height: 0;
   font-size: 1.2rem;
   padding: 0.4rem;
   text-transform: uppercase;
   text-align: center;
+  color: #696969;
+  background-color: #fff;
+  border: none;
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &:hover {
+    color: #908d8d;
+    cursor: pointer;
   }
 `;
 
