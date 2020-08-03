@@ -95,16 +95,31 @@ export default ({levels, onSelect, selectedValue}: Props) => {
         li.style.outline = '';
         li.classList.remove('react-panel-search-highlighted-item')
       }
-      let index: number;
-      if (state.highlightedIndex >= liElms.length) {
-        index = Math.abs(state.highlightedIndex - liElms.length)
-      } else if (state.highlightedIndex < 0) {
-        index = liElms.length + state.highlightedIndex;
-      } else {
-        index = state.highlightedIndex;
+      if (liElms.length) {
+        let index: number;
+        if (state.highlightedIndex >= liElms.length) {
+          index = Math.abs(state.highlightedIndex - liElms.length)
+          updateState({...state, highlightedIndex: 0})
+        } else if (state.highlightedIndex < 0) {
+          index = liElms.length + state.highlightedIndex;
+          updateState({...state, highlightedIndex: liElms.length - 1})
+        } else {
+          index = state.highlightedIndex;
+        }
+        liElms[index].style.outline = 'solid 1px blue';
+        liElms[index].classList.add('react-panel-search-highlighted-item');
+        const highlightedTop = liElms[index].offsetTop;
+        const highlightedBottom = highlightedTop + liElms[index].offsetHeight;
+
+        const containerScrollTop = node.scrollTop;
+        const containerScrollBottom = containerScrollTop + node.offsetHeight;
+
+        if (highlightedBottom > containerScrollBottom) {
+          node.scrollTop = highlightedBottom - node.offsetHeight;
+        } else if (highlightedTop < containerScrollTop) {
+          node.scrollTop = highlightedTop;
+        }
       }
-      liElms[index].style.outline = 'solid 1px blue';
-      liElms[index].classList.add('react-panel-search-highlighted-item');
     }
   }, [state]);
 
@@ -264,7 +279,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
 
   const backdrop  = state.isOpen ? (
     <Backdrop
-      onClick={() => updateState({...state, isOpen: false})}
+      onClick={() => updateState({...state, highlightedIndex: 0, isOpen: false})}
     />
   ) : null;
 
