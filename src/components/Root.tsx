@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Level, Datum} from '../'
 import StandardSearch from './StandardSearch';
 import sortBy from 'lodash/sortBy';
@@ -15,6 +15,7 @@ interface State {
   parent: Datum['parent_id'];
   selected: Datum | null;
   searchQuery: string;
+  highlightedIndex: number;
 }
 
 export default ({levels, onSelect, selectedValue}: Props) => {
@@ -25,6 +26,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     parent: null,
     selected: selectedValue,
     searchQuery: '',
+    highlightedIndex: 0,
   });
 
   const updateState = (newState: State) => {
@@ -32,7 +34,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
   }
 
   const clearSearch = () => {
-    updateState({...state, selected: null, searchQuery: ''})
+    updateState({...state, selected: null, searchQuery: '', highlightedIndex: 0})
     if (onSelect) {
       onSelect(null);
     }
@@ -49,7 +51,30 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     if (previousSelectedValue && !selectedValue) {
       updateState({...state, selected: null, searchQuery: ''})
     }
-  }, [selectedValue, previousSelectedValue])
+  }, [selectedValue, previousSelectedValue]);
+
+  const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = resultsRef.current;
+    if (node) {
+      const liElms = Array.from(node.querySelectorAll<HTMLButtonElement>('li .react-panel-search-list-item'));
+      for (let li of liElms) {
+        li.style.outline = '';
+        li.classList.remove('react-panel-search-highlighted-item')
+      }
+      let index: number;
+      if (state.highlightedIndex >= liElms.length) {
+        index = Math.abs(state.highlightedIndex - liElms.length)
+      } else if (state.highlightedIndex < 0) {
+        index = liElms.length + state.highlightedIndex;
+      } else {
+        index = state.highlightedIndex;
+      }
+      liElms[index].style.outline = 'solid 1px blue';
+      liElms[index].classList.add('react-panel-search-highlighted-item');
+    }
+  }, [state]);
 
   let listOutput: React.ReactElement<any>;
 
@@ -85,7 +110,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
             <li
               key={'search-' + child.title + child.id}
             >
-              <button onClick={onSearch}>{child.title}</button>
+              <button onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</button>
               {childList}
             </li>
           );
@@ -113,7 +138,7 @@ export default ({levels, onSelect, selectedValue}: Props) => {
           }
           filteredElms.push(
             <li key={'search-' + datum.title + datum.id}>
-              <button onClick={onSearch}>{datum.title}</button>
+              <button onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</button>
               {childList}
             </li>
           );
@@ -133,14 +158,17 @@ export default ({levels, onSelect, selectedValue}: Props) => {
       }
       const continueButton = targetIndex !== levels.length - 1 ? (
         <button
-          onClick={() => updateState({...state, level: levels[targetIndex + 1].level, parent: d.id})}
+          onClick={() => updateState({
+            ...state, level: levels[targetIndex + 1].level, parent: d.id, 
+            highlightedIndex: 0,
+          })}
         >
           {'>'}
         </button>
       ) : null;
       return (
         <li key={d.id}>
-          <button onClick={onSearch}>{d.title}</button> {continueButton}
+          <button onClick={onSearch} className={'react-panel-search-list-item'}>{d.title}</button> {continueButton}
         </li>
       );
     });
@@ -156,7 +184,12 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     ) : (
       <React.Fragment>
         <button
-          onClick={() => updateState({...state, level: levels[targetIndex - 1].level, parent: parentDatum.parent_id})}
+          onClick={() => updateState({
+            ...state,
+            level: levels[targetIndex - 1].level,
+            parent: parentDatum.parent_id,
+            highlightedIndex: 0,
+          })}
         >
           {'<'}
         </button>
@@ -177,18 +210,47 @@ export default ({levels, onSelect, selectedValue}: Props) => {
     );
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.which === 40 || e.keyCode === 40) {
+      updateState({...state, highlightedIndex: state.highlightedIndex + 1})
+    } else if (e.which === 38 || e.keyCode === 38) {
+      updateState({...state, highlightedIndex: state.highlightedIndex - 1})
+    } else if (e.which === 13 || e.keyCode === 13) { 
+      const node = resultsRef.current;
+      if (node) {
+        const highlightedElm = node.querySelector<HTMLButtonElement>('li .react-panel-search-highlighted-item');
+        if (highlightedElm) {
+          highlightedElm.click();
+          const focusedInput = document.activeElement as HTMLElement;
+          if (focusedInput) {
+            focusedInput.blur();
+          }
+        }
+      }
+    }
+  }
+  console.log(state.highlightedIndex)
   return (
     <React.Fragment>
       <div>
         <StandardSearch
           placeholder={state.selected ? state.selected.title : 'Search'}
-          setSearchQuery={val => updateState({...state, searchQuery: val, level: levels[0].level, parent: null})}
+          setSearchQuery={val => updateState({
+            ...state,
+            searchQuery: val,
+            level: levels[0].level,
+            parent: null,
+            highlightedIndex: 0,
+          })}
           initialQuery={''}
           onClear={clearSearch}
           hasSelection={state.selected ? true : false}
+          handleKeyDown={handleKeyDown}
         />
       </div>
-      {listOutput}
+      <div ref={resultsRef}>
+        {listOutput}
+      </div>
     </React.Fragment>
   );
 }

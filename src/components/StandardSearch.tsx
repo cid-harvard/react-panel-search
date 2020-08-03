@@ -49,11 +49,12 @@ interface Props {
   initialQuery: string;
   onClear: () => void;
   hasSelection: boolean;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
   type?: string;
 }
 
 const StandardSearch = (props: Props) => {
-  const { placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection } = props;
+  const { placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection, handleKeyDown } = props;
 
   const previousPlaceholder = usePrevious(placeholder);
 
@@ -105,6 +106,7 @@ const StandardSearch = (props: Props) => {
         onChange={onChange}
         autoComplete={'off'}
         $hasSelection={hasSelection}
+        onKeyDown={handleKeyDown}
       />
       <ClearButton
         ref={clearEl}
