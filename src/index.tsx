@@ -47,7 +47,7 @@ const PanelSearch = (props: Props) => {
     onTraverseLevel,
   } = props;
   const levels: Level[] = [];
-  data.forEach(datum => {
+  sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
     let targetIndex = levels.findIndex(({level}) => level === datum.level);
     if (targetIndex === -1) {
       levels.push({
