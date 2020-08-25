@@ -187,7 +187,7 @@ export default (props: Props) => {
     if (previousSelectedValue && !selectedValue) {
       updateState({...state, selected: null, searchQuery: ''})
     } else if (selectedValue) {
-      updateState({...state, selected: selectedValue, searchQuery: selectedValue.title})
+      updateState({...state, selected: selectedValue})
     }
   }, [selectedValue, previousSelectedValue]);
 
@@ -254,11 +254,21 @@ export default (props: Props) => {
               {childElms}
             </ul>
           ) : null;
+          const onContinue = () => {
+            const targetIndex = levels.findIndex(({level}) => level === state.level);
+            updateState({
+              ...state, level: levels[targetIndex + 1].level, parent: child.id, 
+              highlightedIndex: 0, selected: null, searchQuery: '',
+            })
+            if (onTraverseLevel !== undefined) {
+              onTraverseLevel(child);
+            }
+          }
           const onSearch = () => {
             selectDatum(child)
           }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
-            <span>{child.title}</span>
+            <SearchButton onClick={onContinue}>{child.title}</SearchButton>
           ) : (
             <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</SearchButton>
           )
@@ -289,11 +299,21 @@ export default (props: Props) => {
               {childElms}
             </ul>
           ) : null;
+          const onContinue = () => {
+            const targetIndex = levels.findIndex(({level}) => level === state.level);
+            updateState({
+              ...state, level: levels[targetIndex + 1].level, parent: datum.id, 
+              highlightedIndex: 0, selected: null, searchQuery: '',
+            })
+            if (onTraverseLevel !== undefined) {
+              onTraverseLevel(datum);
+            }
+          }
           const onSearch = () => {
             selectDatum(datum)
           }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(level) ? (
-            <span>{datum.title}</span>
+            <SearchButton onClick={onContinue}>{datum.title}</SearchButton>
           ) : (
             <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</SearchButton>
           )
