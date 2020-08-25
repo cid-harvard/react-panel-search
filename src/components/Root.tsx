@@ -140,6 +140,7 @@ interface Props {
   levels: Level[];
   onSelect: undefined | ((value: Datum | null) => void);
   onTraverseLevel: undefined | ((value: Datum, direction: Direction) => void);
+  onHover: undefined | ((value: Datum | null) => void);
   selectedValue: Datum | null;
   topLevelTitle: string | undefined;
   disallowSelectionLevels: undefined | (Level['level'][]);
@@ -157,7 +158,7 @@ interface State {
 export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel,
+    onTraverseLevel, onHover,
   } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
@@ -234,6 +235,13 @@ export default (props: Props) => {
     }
   }, [state]);
 
+
+  const onMouseLeave = () => {
+    if (onHover) {
+      onHover(null);
+    }
+  }
+
   let listOutput: React.ReactElement<any>;
 
   if (state.searchQuery.length) {
@@ -274,10 +282,29 @@ export default (props: Props) => {
           const onSearch = () => {
             selectDatum(child)
           }
+          const onMouseEnter = () => {
+            if (onHover) {
+              onHover(child);
+            }
+          }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
-            <SearchButton onClick={onContinue} className={'react-panel-search-list-item traverse-only'}>{child.title}</SearchButton>
+            <SearchButton
+              onClick={onContinue}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              className={'react-panel-search-list-item traverse-only'}
+            >
+              {child.title}
+            </SearchButton>
           ) : (
-            <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</SearchButton>
+            <SearchButton
+              onClick={onSearch}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              className={'react-panel-search-list-item'}
+            >
+              {child.title}
+            </SearchButton>
           )
           elms.push(
             <li
@@ -319,10 +346,29 @@ export default (props: Props) => {
           const onSearch = () => {
             selectDatum(datum)
           }
+          const onMouseEnter = () => {
+            if (onHover) {
+              onHover(datum);
+            }
+          }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(level) ? (
-            <SearchButton onClick={onContinue} className={'react-panel-search-list-item traverse-only'}>{datum.title}</SearchButton>
+            <SearchButton
+              onClick={onContinue}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              className={'react-panel-search-list-item traverse-only'}
+            >
+              {datum.title}
+            </SearchButton>
           ) : (
-            <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</SearchButton>
+            <SearchButton
+              onClick={onSearch}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              className={'react-panel-search-list-item'}
+            >
+              {datum.title}
+            </SearchButton>
           )
           filteredElms.push(
             <li key={'search-' + datum.title + datum.id}>
@@ -365,9 +411,20 @@ export default (props: Props) => {
           {'>'}
         </NextButton>
       ) : null;
+
+      const onMouseEnter = () => {
+        if (onHover) {
+          onHover(d);
+        }
+      }
       return (
         <PanelItem key={d.id}>
-          <PanelButton onClick={onSearch} className={className}>{d.title}</PanelButton> {continueButton}
+          <PanelButton
+            onClick={onSearch}
+            className={className}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          >{d.title}</PanelButton> {continueButton}
         </PanelItem>
       );
     });
