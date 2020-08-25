@@ -134,6 +134,7 @@ const SearchButton = styled(ButtonBase)`
 interface Props {
   levels: Level[];
   onSelect: undefined | ((value: Datum | null) => void);
+  onTraverseLevel: undefined | ((value: Datum) => void);
   selectedValue: Datum | null;
   topLevelTitle: string | undefined;
   disallowSelectionLevels: undefined | (Level['level'][]);
@@ -151,6 +152,7 @@ interface State {
 export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
+    onTraverseLevel,
   } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
@@ -315,6 +317,9 @@ export default (props: Props) => {
           ...state, level: levels[targetIndex + 1].level, parent: d.id, 
           highlightedIndex: 0,
         })
+        if (onTraverseLevel !== undefined) {
+          onTraverseLevel(d);
+        }
       }
       const onSearch = () => {
         if (disallowSelectionLevels && disallowSelectionLevels.includes(levels[targetIndex].level)) {
@@ -343,12 +348,17 @@ export default (props: Props) => {
     const breadCrumb = !parentDatum ? titleText : (
       <React.Fragment>
         <NavButton
-          onClick={() => updateState({
-            ...state,
-            level: levels[targetIndex - 1].level,
-            parent: parentDatum.parent_id,
-            highlightedIndex: 0,
-          })}
+          onClick={() => {
+            updateState({
+              ...state,
+              level: levels[targetIndex - 1].level,
+              parent: parentDatum.parent_id,
+              highlightedIndex: 0,
+            });
+            if (onTraverseLevel !== undefined) {
+              onTraverseLevel(parentDatum);
+            }
+          }}
         >
           {'<'}
         </NavButton>

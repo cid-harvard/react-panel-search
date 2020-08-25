@@ -76,8 +76,10 @@ const App = () => {
         <PanelSearch
           data={data}
           topLevelTitle={'All Industries'}
+          disallowSelectionLevels={[2]}
           onSelect={setSelectedValue}
           selectedValue={selectedValue}
+          onTraverseLevel={d => console.log(d)}
         />
       </SearchContainer>
     </Root>

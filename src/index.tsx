@@ -36,6 +36,7 @@ interface Props {
   data: Datum[];
   topLevelTitle?: string;
   onSelect?: (value: Datum | null) => void;
+  onTraverseLevel?: (value: Datum) => void;
   selectedValue?: Datum | null;
   disallowSelectionLevels?: Level['level'][];
 }
@@ -43,6 +44,7 @@ interface Props {
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
+    onTraverseLevel,
   } = props;
   const levels: Level[] = [];
   data.forEach(datum => {
@@ -63,6 +65,7 @@ const PanelSearch = (props: Props) => {
         <Root
           levels={sortedLevels}
           onSelect={onSelect}
+          onTraverseLevel={onTraverseLevel}
           selectedValue={selectedValue ? selectedValue : null}
           topLevelTitle={topLevelTitle}
           disallowSelectionLevels={disallowSelectionLevels}

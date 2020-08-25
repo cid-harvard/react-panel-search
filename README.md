@@ -41,6 +41,7 @@ The only required prop for react-panel-search is `data`, which is an array of ty
     - **level**: `number | string` The hierarchal level of this datum. The order of levels is automatically calculated based on value going from numeric high-to-low then alphabetical A-Z
     - **parent_id**: `number | string | null` The id of the parent value, one level higher than the current datum's level. For a top level datum, this should be `null`
 - **topLevelTitle** *(optional)*: `string` The title text that will appear in the panel when at the highest tier
+- **onTraverseLevel** *(optional)*: `(value: Datum) => void` Callback function for returning the value of the node being traversed.
 - **onSelect** *(optional)*: `(value: Datum | null) => void` Callback function for returning the selected value.
 - **selectedValue** *(optional)*: `Datum | null` This can be used to both set an initially selected value or to clear the current value with an external component
 - **disallowSelectionLevels** *(optional)*: `Array<number | string>` An array of values corresponding to levels of datum that should only serve as a hierarchal category and not be selectable.
