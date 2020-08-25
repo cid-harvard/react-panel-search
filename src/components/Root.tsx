@@ -186,6 +186,8 @@ export default (props: Props) => {
   useEffect(() => {
     if (previousSelectedValue && !selectedValue) {
       updateState({...state, selected: null, searchQuery: ''})
+    } else if (selectedValue) {
+      updateState({...state, selected: selectedValue, searchQuery: selectedValue.title})
     }
   }, [selectedValue, previousSelectedValue]);
 

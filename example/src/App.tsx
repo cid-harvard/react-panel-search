@@ -67,7 +67,9 @@ const App = () => {
   })
 
   const selectedText = selectedValue ? 'Selected: ' + selectedValue.title : 'Nothing selected';
-  const clearButton  = selectedValue ? <ClearButton onClick={() => setSelectedValue(null)}>Clear</ClearButton> : null;
+  const clearButton  = selectedValue
+    ? <ClearButton onClick={() => setSelectedValue(null)}>Clear</ClearButton>
+    : <ClearButton onClick={() => setSelectedValue(data[Math.floor(Math.random() * data.length)])}>Set value randomly</ClearButton>
 
   return (
     <Root>
