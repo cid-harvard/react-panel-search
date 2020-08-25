@@ -131,10 +131,15 @@ const SearchButton = styled(ButtonBase)`
   padding: 0.6rem 0.75rem
 `;
 
+export enum Direction {
+  asc = 'asc',
+  desc = 'desc',
+}
+
 interface Props {
   levels: Level[];
   onSelect: undefined | ((value: Datum | null) => void);
-  onTraverseLevel: undefined | ((value: Datum) => void);
+  onTraverseLevel: undefined | ((value: Datum, direction: Direction) => void);
   selectedValue: Datum | null;
   topLevelTitle: string | undefined;
   disallowSelectionLevels: undefined | (Level['level'][]);
@@ -220,6 +225,8 @@ export default (props: Props) => {
 
         if (highlightedBottom > containerScrollBottom) {
           node.scrollTop = highlightedBottom - node.offsetHeight;
+        } else if (highlightedTop < liElms[index].offsetHeight) {
+          node.scrollTop = 0;
         } else if (highlightedTop < containerScrollTop) {
           node.scrollTop = highlightedTop;
         }
@@ -261,14 +268,14 @@ export default (props: Props) => {
               highlightedIndex: 0, selected: null, searchQuery: '',
             })
             if (onTraverseLevel !== undefined) {
-              onTraverseLevel(child);
+              onTraverseLevel(child, Direction.desc);
             }
           }
           const onSearch = () => {
             selectDatum(child)
           }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
-            <SearchButton onClick={onContinue}>{child.title}</SearchButton>
+            <SearchButton onClick={onContinue} className={'react-panel-search-list-item traverse-only'}>{child.title}</SearchButton>
           ) : (
             <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{child.title}</SearchButton>
           )
@@ -306,14 +313,14 @@ export default (props: Props) => {
               highlightedIndex: 0, selected: null, searchQuery: '',
             })
             if (onTraverseLevel !== undefined) {
-              onTraverseLevel(datum);
+              onTraverseLevel(datum, Direction.desc);
             }
           }
           const onSearch = () => {
             selectDatum(datum)
           }
           const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(level) ? (
-            <SearchButton onClick={onContinue}>{datum.title}</SearchButton>
+            <SearchButton onClick={onContinue} className={'react-panel-search-list-item traverse-only'}>{datum.title}</SearchButton>
           ) : (
             <SearchButton onClick={onSearch} className={'react-panel-search-list-item'}>{datum.title}</SearchButton>
           )
@@ -340,7 +347,7 @@ export default (props: Props) => {
           highlightedIndex: 0,
         })
         if (onTraverseLevel !== undefined) {
-          onTraverseLevel(d);
+          onTraverseLevel(d, Direction.desc);
         }
       }
       const onSearch = () => {
@@ -350,6 +357,9 @@ export default (props: Props) => {
           selectDatum(d)
         }
       }
+      const className = disallowSelectionLevels && disallowSelectionLevels.includes(levels[targetIndex].level)
+        ? 'react-panel-search-list-item traverse-only'
+        : 'react-panel-search-list-item';
       const continueButton = targetIndex !== levels.length - 1 ? (
         <NextButton onClick={onContinue}>
           {'>'}
@@ -357,7 +367,7 @@ export default (props: Props) => {
       ) : null;
       return (
         <PanelItem key={d.id}>
-          <PanelButton onClick={onSearch} className={'react-panel-search-list-item'}>{d.title}</PanelButton> {continueButton}
+          <PanelButton onClick={onSearch} className={className}>{d.title}</PanelButton> {continueButton}
         </PanelItem>
       );
     });
@@ -378,7 +388,7 @@ export default (props: Props) => {
               highlightedIndex: 0,
             });
             if (onTraverseLevel !== undefined) {
-              onTraverseLevel(parentDatum);
+              onTraverseLevel(parentDatum, Direction.asc);
             }
           }}
         >
@@ -412,9 +422,11 @@ export default (props: Props) => {
         const highlightedElm = node.querySelector<HTMLButtonElement>('li .react-panel-search-highlighted-item');
         if (highlightedElm) {
           highlightedElm.click();
-          const focusedInput = document.activeElement as HTMLElement;
-          if (focusedInput) {
-            focusedInput.blur();
+          if (!highlightedElm.classList.contains('traverse-only')) {
+            const focusedInput = document.activeElement as HTMLElement;
+            if (focusedInput) {
+              focusedInput.blur();
+            }
           }
         }
       }

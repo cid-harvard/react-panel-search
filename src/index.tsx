@@ -1,6 +1,6 @@
 import React from 'react'
 import sortBy from 'lodash/sortBy';
-import Root from './components/Root';
+import Root, {Direction} from './components/Root';
 
 // Singular datum
 export interface Datum {
@@ -36,7 +36,7 @@ interface Props {
   data: Datum[];
   topLevelTitle?: string;
   onSelect?: (value: Datum | null) => void;
-  onTraverseLevel?: (value: Datum) => void;
+  onTraverseLevel?: (value: Datum, direction: Direction) => void;
   selectedValue?: Datum | null;
   disallowSelectionLevels?: Level['level'][];
 }

@@ -81,7 +81,7 @@ const App = () => {
           disallowSelectionLevels={[2]}
           onSelect={setSelectedValue}
           selectedValue={selectedValue}
-          onTraverseLevel={d => console.log(d)}
+          onTraverseLevel={(data, direction) => console.log(data.id, direction)}
         />
       </SearchContainer>
     </Root>
