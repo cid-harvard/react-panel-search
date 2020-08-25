@@ -1,6 +1,6 @@
 {
   "name": "react-panel-search",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A fast and lightweight component for searching and selecting hierarchical tree data.",
   "author": "Kyle Soeltz <kyle@soeltz.com> (https://soeltz.com)",
   "license": "MIT",
