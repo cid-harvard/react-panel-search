@@ -228,7 +228,7 @@ export default (props: Props) => {
     const preventClickFromPropagating = (e: MouseEvent) => {
       e.stopPropagation();
     };
-    const closeDropdown = () => updateState({...state, highlightedIndex: 0, isOpen: false});
+    const closeDropdown = () => setState(current => ({...current, highlightedIndex: 0, isOpen: false}));
     if (rootRef.current !== null) {
       el = rootRef.current;
       el.addEventListener('mousedown', preventClickFromPropagating);
