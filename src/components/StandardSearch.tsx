@@ -128,6 +128,9 @@ const StandardSearch = (props: Props) => {
       if (clearEl && clearEl.current) {
         clearEl.current.style.display = searchEl.current.value.length || hasSelection ? 'block' : 'none';
       }
+      if (dropdownEl && dropdownEl.current) {
+        dropdownEl.current.style.display = searchEl.current.value.length || hasSelection ? 'none' : 'block';
+      }
     }
   }, 400);
 
@@ -198,7 +201,7 @@ const StandardSearch = (props: Props) => {
         ref={dropdownEl}
         className={'react-panel-search-search-bar-dropdown-arrow'}
         style={{
-          display: 'none',
+          display: 'block',
         }}
         dangerouslySetInnerHTML={{__html: chevronSVG}}
       />
