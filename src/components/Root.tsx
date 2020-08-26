@@ -34,17 +34,17 @@ const Container = styled.div`
 
 `;
 
-const Backdrop = styled.div`
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.2);
-`;
+// const Backdrop = styled.div`
+//   position: fixed;
+//   width: 100vw;
+//   height: 100vh;
+//   z-index: -1;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   background-color: rgba(0, 0, 0, 0.2);
+// `;
 
 const SearchBar = styled.div`
   position: relative;
@@ -197,6 +197,27 @@ export default (props: Props) => {
     }
   }, [selectedValue, previousSelectedValue]);
 
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    let el: HTMLDivElement;
+    const preventClickFromPropagating = (e: MouseEvent) => {
+      e.stopPropagation();
+    };
+    const closeDropdown = () => updateState({...state, highlightedIndex: 0, isOpen: false});
+    if (rootRef.current !== null) {
+      el = rootRef.current;
+      el.addEventListener('mousedown', preventClickFromPropagating);
+    }
+
+    document.addEventListener('mousedown', closeDropdown);
+    return () => {
+      document.removeEventListener('mousedown', closeDropdown);
+      if (el) {
+        el.removeEventListener('mousedown', preventClickFromPropagating);
+      }
+    };
+  }, [rootRef]);
+
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -233,7 +254,7 @@ export default (props: Props) => {
         }
       }
     }
-  }, [state]);
+  }, [state, resultsRef]);
 
 
   const onMouseLeave = () => {
@@ -490,11 +511,11 @@ export default (props: Props) => {
     }
   }
 
-  const backdrop  = state.isOpen ? (
-    <Backdrop
-      onClick={() => updateState({...state, highlightedIndex: 0, isOpen: false})}
-    />
-  ) : null;
+  // const backdrop  = state.isOpen ? (
+  //   <Backdrop
+  //     onClick={() => updateState({...state, highlightedIndex: 0, isOpen: false})}
+  //   />
+  // ) : null;
 
   const searchResults = state.isOpen ? (
     <SearchResults ref={resultsRef}>
@@ -504,9 +525,9 @@ export default (props: Props) => {
 
   return (
     <Container
+      ref={rootRef}
       style={{zIndex: state.isOpen ? 2000 : undefined}}
     >
-      {backdrop}
       <SearchBar>
         <StandardSearch
           placeholder={state.selected ? state.selected.title : 'Search'}
