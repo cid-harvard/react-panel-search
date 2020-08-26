@@ -41,12 +41,13 @@ interface Props {
   selectedValue?: Datum | null;
   disallowSelectionLevels?: Level['level'][];
   defaultPlaceholderText?: string;
+  showCount?: boolean;
 }
 
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel, defaultPlaceholderText,
+    onTraverseLevel, defaultPlaceholderText, showCount,
   } = props;
   const levels: Level[] = [];
   sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
@@ -72,6 +73,7 @@ const PanelSearch = (props: Props) => {
         topLevelTitle={topLevelTitle}
         disallowSelectionLevels={disallowSelectionLevels}
         defaultPlaceholderText={defaultPlaceholderText ? defaultPlaceholderText : 'Search'}
+        showCount={showCount ? showCount : false}
       />
     );
   } else {

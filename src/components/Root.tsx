@@ -22,8 +22,6 @@ const Container = styled.div`
 
   li {
     li {
-      padding-left: 1rem;
-
       button:before {
         content: '↳';
         margin-right: 0.5rem;
@@ -76,11 +74,11 @@ const BreadCrumb = styled(Title)`
 
 const NavButton = styled.button`
   border: none;
+  outline: none;
   display: flex;
   justify-content: center;
-  height: 1rem;
+  height: 100%;
   width: 1.4rem;
-  margin: auto;
   padding: 0.25rem;
   background-color: transparent;
 
@@ -105,8 +103,10 @@ const NextButton = styled(NavButton)`
   grid-column: 2;
   position: relative;
   margin-right: 1rem;
-  padding: 0.5rem 0.25rem;
-  height: 2rem;
+  padding: 0 0.25rem;
+  height: 1.5rem;
+  background-color: #fff;
+  margin: auto 0.75rem;
 
   &:hover {
     cursor: pointer;
@@ -116,6 +116,11 @@ const NextButton = styled(NavButton)`
   svg {
     transform: rotate(-90deg);
   }
+`;
+
+const TraverseOnlyButton = styled(NextButton)`
+  background-color: transparent;
+  pointer-events: none;
 `;
 
 const PanelItem = styled.li`
@@ -128,6 +133,7 @@ const ButtonBase = styled.button`
   font-size: 0.8rem;
   background-color: #fff;
   border: none;
+  outline: none;
   display: block;
   width: 100%;
   text-align: left;
@@ -163,6 +169,7 @@ interface Props {
   topLevelTitle: string | undefined;
   disallowSelectionLevels: undefined | (Level['level'][]);
   defaultPlaceholderText: string;
+  showCount: boolean;
 }
 
 interface State {
@@ -177,7 +184,7 @@ interface State {
 export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel, onHover, defaultPlaceholderText,
+    onTraverseLevel, onHover, defaultPlaceholderText, showCount,
   } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
@@ -290,7 +297,7 @@ export default (props: Props) => {
     // For each level, check if a parent exists, if so skip it
     const filteredElms: React.ReactElement<any>[] = [];
     const renderedIds: Array<string | number> = [];
-    const getChildren = (index: number, parent: Datum['parent_id']) => {
+    const getChildren = (index: number, parent: Datum['parent_id'], depth: number) => {
       const elms: React.ReactElement<any>[] = [];
       sortBy(levels[index].data, ['name']).forEach((child) => {
         if (child.parent_id === parent &&
@@ -300,7 +307,7 @@ export default (props: Props) => {
           renderedIds.push(child.id);
           let childElms: React.ReactElement<any>[] | null;
           if (levels[index + 1] && levels[index + 1].data) {
-            childElms = getChildren(index + 1, child.id);
+            childElms = getChildren(index + 1, child.id, depth + 1);
           } else {
             childElms = null;
           }
@@ -335,6 +342,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item traverse-only'}
+              style={{paddingLeft: depth + 'rem'}}
             >
               {child.title}
             </SearchButton>
@@ -344,6 +352,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item'}
+              style={{paddingLeft: depth + 'rem'}}
             >
               {child.title}
             </SearchButton>
@@ -367,7 +376,7 @@ export default (props: Props) => {
           renderedIds.push(datum.id);
           let childElms: React.ReactElement<any>[] | null;
           if (levels[i + 1] && levels[i + 1].data) {
-            childElms = getChildren(i + 1, datum.id);
+            childElms = getChildren(i + 1, datum.id, 1);
           } else {
             childElms = null;
           }
@@ -453,11 +462,14 @@ export default (props: Props) => {
           selectDatum(d)
         }
       }
+      const ArrowButton = disallowSelectionLevels && disallowSelectionLevels.includes(levels[targetIndex].level)
+        ? TraverseOnlyButton
+        : NextButton;
       const className = disallowSelectionLevels && disallowSelectionLevels.includes(levels[targetIndex].level)
         ? 'react-panel-search-list-item traverse-only'
         : 'react-panel-search-list-item';
       const continueButton = targetIndex !== levels.length - 1 ? (
-        <NextButton
+        <ArrowButton
           className={'react-panel-search-next-button'}
           onClick={onContinue}
           dangerouslySetInnerHTML={{__html: chevronSVG}}
@@ -469,6 +481,9 @@ export default (props: Props) => {
           onHover(d);
         }
       }
+      const count = showCount && targetIndex !== levels.length - 1
+        ? `(${levels[targetIndex + 1].data.filter(({parent_id}) => parent_id === d.id).length})`
+        : null;
       return (
         <PanelItem
           key={d.id}
@@ -479,7 +494,7 @@ export default (props: Props) => {
             className={className}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-          >{d.title}</PanelButton> {continueButton}
+          >{d.title} {count}</PanelButton> {continueButton}
         </PanelItem>
       );
     });

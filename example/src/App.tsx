@@ -83,6 +83,7 @@ const App = () => {
           onHover={val => console.log(val)}
           selectedValue={selectedValue}
           onTraverseLevel={(data, direction) => console.log(data.id, direction)}
+          showCount={true}
         />
       </SearchContainer>
     </Root>
