@@ -84,6 +84,7 @@ const App = () => {
           selectedValue={selectedValue}
           onTraverseLevel={(data, direction) => console.log(data.id, direction)}
           showCount={true}
+          resultsIdentation={1.75}
         />
       </SearchContainer>
     </Root>

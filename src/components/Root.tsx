@@ -31,7 +31,6 @@ const Container = styled.div`
   .react-panel-search-highlighted-item {
     background-color: #f3f3f3;
   }
-
 `;
 
 const SearchBar = styled.div`
@@ -44,31 +43,34 @@ const SearchResults = styled.div`
   overflow: auto;
   background-color: #fff;
 
-  ul:hover {
+  &:hover {
     .react-panel-search-highlighted-item:not(:hover) {
       background-color: #fff;
     }
   }
 `;
 
-const Title = styled.div`
+const TitleOuter = styled.div`
   font-weight: 600;
-  padding: 0.35rem 0;
-  margin: 0.25rem 0.75rem 0.6rem;
+  padding: 0.25rem 1.75rem 0.6rem;
   text-transform: uppercase;
-  display: grid;
-  grid-column-gap: 0.5rem;
-  grid-template-columns: auto 1fr;
-  border-bottom: solid 1px gray;
   color: #444;
   font-size: 0.85rem;
 `;
 
-const BreadCrumb = styled(Title)`
+const BreadCrumbOuter = styled(TitleOuter)`
   &:hover {
     cursor: pointer;
     background-color: #f3f3f3;
   }
+`;
+
+const Title = styled.div`
+  display: grid;
+  grid-column-gap: 0.5rem;
+  grid-template-columns: auto 1fr;
+  padding: 0.35rem 0;
+  border-bottom: solid 1px gray;
 `;
 
 const NavButton = styled.button`
@@ -101,11 +103,10 @@ const NextButton = styled(NavButton)`
   grid-row: 1;
   grid-column: 2;
   position: relative;
-  margin-right: 1rem;
   padding: 0 0.25rem;
   height: 1.5rem;
   background-color: #fff;
-  margin: auto 0.75rem;
+  margin: auto 1.75rem auto 0.75rem;
 
   &:hover {
     cursor: pointer;
@@ -128,7 +129,7 @@ const PanelItem = styled.li`
 `;
 
 const ButtonBase = styled.button`
-  padding: 0.75rem;
+  padding: 0.75rem 4rem 0.75rem 2rem;
   font-size: 0.8rem;
   background-color: #fff;
   border: none;
@@ -136,7 +137,6 @@ const ButtonBase = styled.button`
   display: block;
   width: 100%;
   text-align: left;
-  padding-right: 3rem;
   box-sizing: border-box;
 
   &:hover {
@@ -169,6 +169,7 @@ interface Props {
   disallowSelectionLevels: undefined | (Level['level'][]);
   defaultPlaceholderText: string;
   showCount: boolean;
+  resultsIdentation: number;
 }
 
 interface State {
@@ -183,7 +184,7 @@ interface State {
 export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel, onHover, defaultPlaceholderText, showCount,
+    onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
   } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
@@ -341,7 +342,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item traverse-only'}
-              style={{paddingLeft: depth + 'rem'}}
+              style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {child.title}
             </SearchButton>
@@ -351,7 +352,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item'}
-              style={{paddingLeft: depth + 'rem'}}
+              style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {child.title}
             </SearchButton>
@@ -410,6 +411,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item traverse-only'}
+              style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {datum.title}
             </SearchButton>
@@ -419,6 +421,7 @@ export default (props: Props) => {
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
               className={'react-panel-search-list-item'}
+              style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {datum.title}
             </SearchButton>
@@ -504,36 +507,44 @@ export default (props: Props) => {
     const titleText = topLevelTitle ? <span>{topLevelTitle}</span> : null;
 
     const breadCrumb = !parentDatum ? (
-      <Title
-        className={'react-panel-search-current-tier-title'}
+      <TitleOuter
+        className={'react-panel-search-current-tier-static-title-outer'}
       >
-        {titleText}
-      </Title>
-    ) : (
-      <BreadCrumb
-        className={'react-panel-search-current-tier-breadcrumb'}
-        onClick={() => {
-          updateState({
-            ...state,
-            level: levels[targetIndex - 1].level,
-            parent: parentDatum.parent_id,
-            highlightedIndex: 0,
-          });
-          if (onTraverseLevel !== undefined) {
-            onTraverseLevel(parentDatum, Direction.asc);
-          }
-        }}
-      >
-        <NavButton
-          className={'react-panel-search-previous-button'}
-          dangerouslySetInnerHTML={{__html: chevronSVG}}
-        />
-        <span
-          className={'react-panel-search-current-tier-text'}
+        <Title
+          className={'react-panel-search-current-tier-title'}
         >
-          {parentDatum.title}
-        </span>
-      </BreadCrumb>
+          {titleText}
+        </Title>
+      </TitleOuter>
+    ) : (
+      <BreadCrumbOuter
+        className={'react-panel-search-current-tier-breadcrumb-outer'}
+      >
+        <Title
+          className={'react-panel-search-current-tier-title'}
+          onClick={() => {
+            updateState({
+              ...state,
+              level: levels[targetIndex - 1].level,
+              parent: parentDatum.parent_id,
+              highlightedIndex: 0,
+            });
+            if (onTraverseLevel !== undefined) {
+              onTraverseLevel(parentDatum, Direction.asc);
+            }
+          }}
+        >
+          <NavButton
+            className={'react-panel-search-previous-button'}
+            dangerouslySetInnerHTML={{__html: chevronSVG}}
+          />
+          <span
+            className={'react-panel-search-current-tier-text'}
+          >
+            {parentDatum.title}
+          </span>
+        </Title>
+      </BreadCrumbOuter>
     )
     listOutput = (
       <React.Fragment>
