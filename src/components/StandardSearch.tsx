@@ -2,17 +2,42 @@ import { debounce } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
 import usePrevious from 'react-use-previous-hook';
+import raw from 'raw.macro';
+
+const magnifyingGlassSVG = raw('../assets/magnifying-glass.svg');
+const chevronSVG = raw('../assets/chevron.svg');
 
 const SearchContainer = styled.label`
   position: relative;
   display: flex;
 `;
 
+const magnifyingGlassSize = 1.5; // in rem
+const magnifyingGlassSpacing = 0.5; // in rem
+
+const SearchIcon = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto ${magnifyingGlassSpacing}rem;
+  width: ${magnifyingGlassSize}rem;
+  cursor: pointer;
+
+  svg {
+    width: 100%;
+    height: 100%;
+
+    path {
+      fill: gray;
+    }
+  }
+`;
+
 const SearchBar = styled.input<{$hasSelection: boolean}>`
   width: 100%;
   max-width: 400px;
   box-sizing: border-box;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem ${magnifyingGlassSize + (magnifyingGlassSpacing * 2)}rem;
   box-sizing: border-box;
   border: solid 1px #dfdfdf;
   font-size: 1.2rem;
@@ -27,6 +52,28 @@ const SearchBar = styled.input<{$hasSelection: boolean}>`
   &:focus {
     &::placeholder {
       color: rgb(255, 255, 255);
+    }
+  }
+`;
+
+const DropDownIcon = styled.div`
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 2px;
+  padding: 0.4rem;
+  background-color: #fff;
+  border: none;
+  width: ${magnifyingGlassSize}rem;
+  cursor: pointer;
+
+  svg {
+    width: 100%;
+    height: 100%;
+
+    polyline {
+      stroke: gray;
+      stroke-width: 0.6px;
     }
   }
 `;
@@ -74,6 +121,7 @@ const StandardSearch = (props: Props) => {
 
   const searchEl = useRef<HTMLInputElement | null>(null);
   const clearEl = useRef<HTMLButtonElement | null>(null);
+  const dropdownEl = useRef<HTMLDivElement | null>(null);
 
   const onChange = debounce(() => {
     if (searchEl !== null && searchEl.current !== null) {
@@ -94,6 +142,9 @@ const StandardSearch = (props: Props) => {
     if (clearEl && clearEl.current) {
       clearEl.current.style.display = 'none';
     }
+    if (dropdownEl && dropdownEl.current) {
+      dropdownEl.current.style.display = 'block';
+    }
   };
 
   useEffect(() => {
@@ -105,6 +156,9 @@ const StandardSearch = (props: Props) => {
       if (clearEl && clearEl.current) {
         clearEl.current.style.display = node.value.length || hasSelection ? 'block' : 'none';
       }
+      if (dropdownEl && dropdownEl.current) {
+        dropdownEl.current.style.display = node.value.length || hasSelection ? 'none' : 'block';
+      }
       if (node.value && hasSelection && previousPlaceholder !== placeholder) {
         node.value = '';
       }
@@ -112,8 +166,15 @@ const StandardSearch = (props: Props) => {
   }, [searchEl, initialQuery, hasSelection, placeholder, previousPlaceholder]);
 
   return (
-    <SearchContainer>
+    <SearchContainer
+      className={'react-panel-search-search-bar-container'}
+    >
+      <SearchIcon
+        className={'react-panel-search-search-bar-search-icon'}
+        dangerouslySetInnerHTML={{__html: magnifyingGlassSVG}}
+      />
       <SearchBar
+        className={'react-panel-search-search-bar-input'}
         ref={searchEl}
         type={type ? type : 'text'}
         placeholder={placeholder}
@@ -124,6 +185,7 @@ const StandardSearch = (props: Props) => {
         onFocus={onFocus}
       />
       <ClearButton
+        className={'react-panel-search-search-bar-clear-button'}
         ref={clearEl}
         style={{
           display: 'none',
@@ -133,6 +195,14 @@ const StandardSearch = (props: Props) => {
       >
         ×
       </ClearButton>
+      <DropDownIcon
+        ref={dropdownEl}
+        className={'react-panel-search-search-bar-dropdown-arrow'}
+        style={{
+          display: 'none',
+        }}
+        dangerouslySetInnerHTML={{__html: chevronSVG}}
+      />
     </SearchContainer>
   );
 };

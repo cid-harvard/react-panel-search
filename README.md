@@ -46,6 +46,11 @@ The only required prop for react-panel-search is `data`, which is an array of ty
 - **onHover** *(optional)*: `(value: Datum | null) => void` Callback function for returning the hovered value.
 - **selectedValue** *(optional)*: `Datum | null` This can be used to both set an initially selected value or to clear the current value with an external component
 - **disallowSelectionLevels** *(optional)*: `Array<number | string>` An array of values corresponding to levels of datum that should only serve as a hierarchal category and not be selectable.
+- **defaultPlaceholderText** *(optional)*: `string` Placeholder text that will appear in the search field when empty
+
+## Usage
+
+react-panel-search comes out of the box with generic styling. However static class names have been added to all of the elements that make up the component to allow for full customizability of its appearance.
 
 ## License
 

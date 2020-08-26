@@ -1,5 +1,5 @@
-import React, {useState} from 'react'
-import PanelSearch, {Datum} from 'react-panel-search'
+import React, {useState} from 'react';
+import PanelSearch, {Datum} from 'react-panel-search';
 
 import raw from 'raw.macro';
 import styled from 'styled-components/macro';

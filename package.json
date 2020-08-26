@@ -64,6 +64,7 @@
     "@types/lodash": "^4.14.158",
     "@types/styled-components": "^5.1.1",
     "lodash": "^4.17.19",
+    "raw.macro": "^0.4.2",
     "react-use-previous-hook": "^1.0.1",
     "styled-components": "^5.1.1"
   }

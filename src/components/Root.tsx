@@ -4,6 +4,9 @@ import StandardSearch from './StandardSearch';
 import sortBy from 'lodash/sortBy';
 import usePrevious from 'react-use-previous-hook';
 import styled from 'styled-components/macro';
+import raw from 'raw.macro';
+
+const chevronSVG = raw('../assets/chevron.svg');
 
 const Container = styled.div`
   position: relative;
@@ -34,18 +37,6 @@ const Container = styled.div`
 
 `;
 
-// const Backdrop = styled.div`
-//   position: fixed;
-//   width: 100vw;
-//   height: 100vh;
-//   z-index: -1;
-//   top: 0;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   background-color: rgba(0, 0, 0, 0.2);
-// `;
-
 const SearchBar = styled.div`
   position: relative;
 `;
@@ -65,31 +56,47 @@ const SearchResults = styled.div`
 
 const Title = styled.div`
   font-weight: 600;
-  padding: 0.3rem 0.75rem;
+  padding: 0.35rem 0;
+  margin: 0.25rem 0.75rem 0.6rem;
+  text-transform: uppercase;
   display: grid;
   grid-column-gap: 0.5rem;
   grid-template-columns: auto 1fr;
-  border-bottom: solid 2px #749aca;
+  border-bottom: solid 1px gray;
+  color: #444;
   font-size: 0.85rem;
 `;
 
+const BreadCrumb = styled(Title)`
+  &:hover {
+    cursor: pointer;
+    background-color: #f3f3f3;
+  }
+`;
+
 const NavButton = styled.button`
-  line-height: 1;
-  font-size: 1rem;
-  text-transform: uppercase;
-  text-align: center;
-  color: #fff;
-  background-color: #749aca;
   border: none;
   display: flex;
   justify-content: center;
   height: 1rem;
-  width: 1rem;
+  width: 1.4rem;
   margin: auto;
-
+  padding: 0.25rem;
+  background-color: transparent;
 
   &:hover {
     cursor: pointer;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(90deg);
+
+    polyline {
+      stroke: gray;
+      stroke-width: 0.75px;
+    }
   }
 `;
 
@@ -98,6 +105,17 @@ const NextButton = styled(NavButton)`
   grid-column: 2;
   position: relative;
   margin-right: 1rem;
+  padding: 0.5rem 0.25rem;
+  height: 2rem;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f3f3f3;
+  }
+
+  svg {
+    transform: rotate(-90deg);
+  }
 `;
 
 const PanelItem = styled.li`
@@ -106,14 +124,14 @@ const PanelItem = styled.li`
 `;
 
 const ButtonBase = styled.button`
-  padding: 1rem 0.75rem;
-  font-size: 0.75rem;
+  padding: 0.75rem;
+  font-size: 0.8rem;
   background-color: #fff;
   border: none;
   display: block;
   width: 100%;
   text-align: left;
-  padding-right: 1.5rem;
+  padding-right: 3rem;
   box-sizing: border-box;
 
   &:hover {
@@ -144,6 +162,7 @@ interface Props {
   selectedValue: Datum | null;
   topLevelTitle: string | undefined;
   disallowSelectionLevels: undefined | (Level['level'][]);
+  defaultPlaceholderText: string;
 }
 
 interface State {
@@ -158,7 +177,7 @@ interface State {
 export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel, onHover,
+    onTraverseLevel, onHover, defaultPlaceholderText,
   } = props;
   const previousSelectedValue = usePrevious(selectedValue);
 
@@ -286,7 +305,9 @@ export default (props: Props) => {
             childElms = null;
           }
           const childList = childElms && childElms.length ? (
-            <ul>
+            <ul
+              className={'react-panel-search-list-inner-container'}
+            >
               {childElms}
             </ul>
           ) : null;
@@ -329,6 +350,7 @@ export default (props: Props) => {
           )
           elms.push(
             <li
+              className={'react-panel-search-list-item-container'}
               key={'search-' + child.title + child.id}
             >
               {resultElm}
@@ -350,7 +372,9 @@ export default (props: Props) => {
             childElms = null;
           }
           const childList = childElms && childElms.length ? (
-            <ul>
+            <ul
+              className={'react-panel-search-list-inner-container'}
+            >
               {childElms}
             </ul>
           ) : null;
@@ -392,7 +416,10 @@ export default (props: Props) => {
             </SearchButton>
           )
           filteredElms.push(
-            <li key={'search-' + datum.title + datum.id}>
+            <li
+              className={'react-panel-search-list-item-container'}
+              key={'search-' + datum.title + datum.id}
+            >
               {resultElm}
               {childList}
             </li>
@@ -401,7 +428,9 @@ export default (props: Props) => {
       });
     });
     listOutput = (
-      <ul>
+      <ul
+        className={'react-panel-search-list-root-container'}
+      >
         {filteredElms}
       </ul>
     );
@@ -428,9 +457,11 @@ export default (props: Props) => {
         ? 'react-panel-search-list-item traverse-only'
         : 'react-panel-search-list-item';
       const continueButton = targetIndex !== levels.length - 1 ? (
-        <NextButton onClick={onContinue}>
-          {'>'}
-        </NextButton>
+        <NextButton
+          className={'react-panel-search-next-button'}
+          onClick={onContinue}
+          dangerouslySetInnerHTML={{__html: chevronSVG}}
+        />
       ) : null;
 
       const onMouseEnter = () => {
@@ -439,7 +470,10 @@ export default (props: Props) => {
         }
       }
       return (
-        <PanelItem key={d.id}>
+        <PanelItem
+          key={d.id}
+          className={'react-panel-search-panel-item-container'}
+        >
           <PanelButton
             onClick={onSearch}
             className={className}
@@ -455,34 +489,44 @@ export default (props: Props) => {
 
     const titleText = topLevelTitle ? <span>{topLevelTitle}</span> : null;
 
-    const breadCrumb = !parentDatum ? titleText : (
-      <React.Fragment>
+    const breadCrumb = !parentDatum ? (
+      <Title
+        className={'react-panel-search-current-tier-title'}
+      >
+        {titleText}
+      </Title>
+    ) : (
+      <BreadCrumb
+        className={'react-panel-search-current-tier-breadcrumb'}
+        onClick={() => {
+          updateState({
+            ...state,
+            level: levels[targetIndex - 1].level,
+            parent: parentDatum.parent_id,
+            highlightedIndex: 0,
+          });
+          if (onTraverseLevel !== undefined) {
+            onTraverseLevel(parentDatum, Direction.asc);
+          }
+        }}
+      >
         <NavButton
-          onClick={() => {
-            updateState({
-              ...state,
-              level: levels[targetIndex - 1].level,
-              parent: parentDatum.parent_id,
-              highlightedIndex: 0,
-            });
-            if (onTraverseLevel !== undefined) {
-              onTraverseLevel(parentDatum, Direction.asc);
-            }
-          }}
+          className={'react-panel-search-previous-button'}
+          dangerouslySetInnerHTML={{__html: chevronSVG}}
+        />
+        <span
+          className={'react-panel-search-current-tier-text'}
         >
-          {'<'}
-        </NavButton>
-        <span>
           {parentDatum.title}
         </span>
-      </React.Fragment>
+      </BreadCrumb>
     )
     listOutput = (
       <React.Fragment>
-        <Title>
-          {breadCrumb}
-        </Title>
-        <ul>
+        {breadCrumb}
+        <ul
+          className={'react-panel-search-panel-list-root-container'}
+        >
             {listItems}
         </ul>
       </React.Fragment>
@@ -511,14 +555,11 @@ export default (props: Props) => {
     }
   }
 
-  // const backdrop  = state.isOpen ? (
-  //   <Backdrop
-  //     onClick={() => updateState({...state, highlightedIndex: 0, isOpen: false})}
-  //   />
-  // ) : null;
-
   const searchResults = state.isOpen ? (
-    <SearchResults ref={resultsRef}>
+    <SearchResults
+      ref={resultsRef}
+      className={'react-panel-search-search-results'}
+    >
       {listOutput}
     </SearchResults>
   ) : null;
@@ -526,11 +567,14 @@ export default (props: Props) => {
   return (
     <Container
       ref={rootRef}
+      className={'react-panel-search-root-container'}
       style={{zIndex: state.isOpen ? 2000 : undefined}}
     >
-      <SearchBar>
+      <SearchBar
+        className={'react-panel-search-search-bar'}
+      >
         <StandardSearch
-          placeholder={state.selected ? state.selected.title : 'Search'}
+          placeholder={state.selected ? state.selected.title : defaultPlaceholderText}
           setSearchQuery={val => updateState({
             ...state,
             searchQuery: val,
