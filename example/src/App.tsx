@@ -18,7 +18,7 @@ const PageTitle = styled.h1`
   color: #444;
   display: flex;
   align-items: center;
-  max-width: 400px;
+  max-width: 1000px;
   margin-bottom: 3rem;
 `;
 
@@ -37,7 +37,7 @@ const ClearButton = styled.button`
 `;
 
 const SearchContainer = styled.div`
-  width: 400px;
+  width: 1000px;
   max-width: 100%;
 `;
 

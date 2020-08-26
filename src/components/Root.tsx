@@ -11,7 +11,6 @@ const chevronSVG = raw('../assets/chevron.svg');
 const Container = styled.div`
   position: relative;
   width: 100%;
-  max-width: 400px;
   color: #333;
 
   ul {

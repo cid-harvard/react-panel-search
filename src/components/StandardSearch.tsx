@@ -35,7 +35,6 @@ const SearchIcon = styled.div`
 
 const SearchBar = styled.input<{$hasSelection: boolean}>`
   width: 100%;
-  max-width: 400px;
   box-sizing: border-box;
   padding: 0.5rem 0.5rem 0.5rem ${magnifyingGlassSize + (magnifyingGlassSpacing * 2)}rem;
   box-sizing: border-box;
