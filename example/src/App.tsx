@@ -80,13 +80,10 @@ const App = () => {
           topLevelTitle={'All Industries'}
           disallowSelectionLevels={[2]}
           onSelect={setSelectedValue}
-          onHover={val => console.log(val)}
           selectedValue={selectedValue}
-          onTraverseLevel={(data, direction) => console.log(data.id, direction)}
           showCount={true}
           resultsIdentation={1.75}
         />
-        Text should be hidden when open
       </SearchContainer>
     </Root>
   );

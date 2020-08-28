@@ -204,14 +204,21 @@ export default (props: Props) => {
   }
 
   const clearSearch = () => {
-    updateState({...state, selected: null, searchQuery: '', highlightedIndex: 0, isOpen: true})
+    updateState({
+      level: levels[0].level,
+      parent: null,
+      selected: null,
+      searchQuery: '',
+      highlightedIndex: 0,
+      isOpen: true,
+    })
     if (onSelect) {
       onSelect(null);
     }
   }
 
   const selectDatum = (value: Datum) => {
-    updateState({...state, selected: value, isOpen: false})
+    updateState({...state, selected: value, isOpen: false, searchQuery: ''})
     if (onSelect) {
       onSelect(value);
     }
