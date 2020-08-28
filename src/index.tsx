@@ -43,12 +43,13 @@ interface Props {
   defaultPlaceholderText?: string;
   showCount?: boolean;
   resultsIdentation?: number;
+  neverEmpty?: boolean;
 }
 
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
-    onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation,
+    onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
   } = props;
   const levels: Level[] = [];
   sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
@@ -76,6 +77,7 @@ const PanelSearch = (props: Props) => {
         defaultPlaceholderText={defaultPlaceholderText ? defaultPlaceholderText : 'Search'}
         showCount={showCount ? showCount : false}
         resultsIdentation={resultsIdentation !== undefined ? resultsIdentation : 1}
+        neverEmpty={neverEmpty ? neverEmpty : false}
       />
     );
   } else {

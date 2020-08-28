@@ -172,6 +172,7 @@ interface Props {
   defaultPlaceholderText: string;
   showCount: boolean;
   resultsIdentation: number;
+  neverEmpty: boolean;
 }
 
 interface State {
@@ -187,13 +188,33 @@ export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
+    neverEmpty,
   } = props;
+
+  let initialSelectedValue: Datum | null = selectedValue;
+  if (neverEmpty) {
+    if (levels.length && initialSelectedValue === null) {
+      let i = 0;
+      do {
+        if (!disallowSelectionLevels || (
+          !disallowSelectionLevels.find(l => l === levels[i].level))
+          && levels[i].data.length
+        ) {
+          initialSelectedValue = levels[i].data[0];
+          break;
+        }
+        i++;
+      }
+      while (i < levels.length)
+    }
+  }
+
   const previousSelectedValue = usePrevious(selectedValue);
 
   const [state, setState] = useState<State>({
     level: levels[0].level,
     parent: null,
-    selected: selectedValue,
+    selected: initialSelectedValue,
     searchQuery: '',
     highlightedIndex: 0,
     isOpen: false,
@@ -204,16 +225,17 @@ export default (props: Props) => {
   }
 
   const clearSearch = () => {
+    const newSelected = neverEmpty ? state.selected : null;
     updateState({
       level: levels[0].level,
       parent: null,
-      selected: null,
+      selected: newSelected,
       searchQuery: '',
       highlightedIndex: 0,
       isOpen: true,
     })
     if (onSelect) {
-      onSelect(null);
+      onSelect(newSelected);
     }
   }
 
@@ -225,7 +247,7 @@ export default (props: Props) => {
   }
 
   useEffect(() => {
-    if (previousSelectedValue && !selectedValue) {
+    if (previousSelectedValue && !selectedValue && !neverEmpty) {
       updateState({...state, selected: null, searchQuery: ''})
     } else if (selectedValue) {
       updateState({...state, selected: selectedValue})
@@ -619,6 +641,7 @@ export default (props: Props) => {
           initialQuery={''}
           onClear={clearSearch}
           hasSelection={state.selected ? true : false}
+          neverEmpty={neverEmpty}
           handleKeyDown={handleKeyDown}
           onFocus={() => updateState({...state, isOpen: true})}
         />

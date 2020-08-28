@@ -110,11 +110,15 @@ interface Props {
   hasSelection: boolean;
   handleKeyDown: (event: React.KeyboardEvent) => void;
   onFocus: () => void;
+  neverEmpty: boolean;
   type?: string;
 }
 
 const StandardSearch = (props: Props) => {
-  const { placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection, handleKeyDown, onFocus } = props;
+  const {
+    placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection, handleKeyDown, onFocus,
+    neverEmpty,
+  } = props;
 
   const previousPlaceholder = usePrevious(placeholder);
 
@@ -126,10 +130,14 @@ const StandardSearch = (props: Props) => {
     if (searchEl !== null && searchEl.current !== null) {
       setSearchQuery(searchEl.current.value);
       if (clearEl && clearEl.current) {
-        clearEl.current.style.display = searchEl.current.value.length || hasSelection ? 'block' : 'none';
+        clearEl.current.style.display = !neverEmpty && (searchEl.current.value.length || hasSelection)
+          ? 'block'
+          : 'none';
       }
       if (dropdownEl && dropdownEl.current) {
-        dropdownEl.current.style.display = searchEl.current.value.length || hasSelection ? 'none' : 'block';
+        dropdownEl.current.style.display = !neverEmpty && (searchEl.current.value.length || hasSelection)
+          ? 'none'
+          : 'block';
       }
     }
   }, 400);
@@ -141,7 +149,7 @@ const StandardSearch = (props: Props) => {
       setSearchQuery(searchEl.current.value);
       onClear();
     }
-    if (clearEl && clearEl.current) {
+    if (clearEl && clearEl.current && !neverEmpty) {
       clearEl.current.style.display = 'none';
     }
     if (dropdownEl && dropdownEl.current) {
@@ -156,10 +164,10 @@ const StandardSearch = (props: Props) => {
         node.value = initialQuery;
       }
       if (clearEl && clearEl.current) {
-        clearEl.current.style.display = node.value.length || hasSelection ? 'block' : 'none';
+        clearEl.current.style.display = !neverEmpty && (node.value.length || hasSelection) ? 'block' : 'none';
       }
       if (dropdownEl && dropdownEl.current) {
-        dropdownEl.current.style.display = node.value.length || hasSelection ? 'none' : 'block';
+        dropdownEl.current.style.display = !neverEmpty && (node.value.length || hasSelection) ? 'none' : 'block';
       }
       if (node.value && hasSelection && previousPlaceholder !== placeholder) {
         node.value = '';
