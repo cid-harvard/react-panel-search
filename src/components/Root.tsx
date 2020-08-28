@@ -38,7 +38,9 @@ const SearchBar = styled.div`
 `;
 
 const SearchResults = styled.div`
-  position: relative;
+  position: absolute;
+  width: 100%;
+  box-sizing: border-box;
   max-height: 300px;
   overflow: auto;
   background-color: #fff;

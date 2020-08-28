@@ -86,6 +86,7 @@ const App = () => {
           showCount={true}
           resultsIdentation={1.75}
         />
+        Text should be hidden when open
       </SearchContainer>
     </Root>
   );
