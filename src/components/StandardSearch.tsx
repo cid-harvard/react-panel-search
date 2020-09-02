@@ -57,10 +57,10 @@ const SearchBar = styled.input<{$hasSelection: boolean}>`
 
 const DropDownIcon = styled.div`
   position: absolute;
-  top: 2px;
-  bottom: 2px;
+  top: 3px;
+  bottom: 3px;
   right: 2px;
-  padding: 0.4rem;
+  padding: 0 0.4rem;
   background-color: #fff;
   border: none;
   width: ${magnifyingGlassSize}rem;

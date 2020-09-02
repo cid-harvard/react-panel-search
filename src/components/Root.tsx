@@ -50,6 +50,18 @@ const SearchResults = styled.div`
       background-color: #fff;
     }
   }
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .3);
+  }
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, .1);
+  }
 `;
 
 const TitleOuter = styled.div`
