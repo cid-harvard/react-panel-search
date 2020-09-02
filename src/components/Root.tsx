@@ -656,6 +656,8 @@ export default (props: Props) => {
           neverEmpty={neverEmpty}
           handleKeyDown={handleKeyDown}
           onFocus={() => updateState({...state, isOpen: true})}
+          isOpen={state.isOpen}
+          setIsOpen={(isOpen) => updateState({...state, isOpen})}
         />
       </SearchBar>
       {searchResults}

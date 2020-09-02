@@ -112,12 +112,15 @@ interface Props {
   onFocus: () => void;
   neverEmpty: boolean;
   type?: string;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
 }
 
 const StandardSearch = (props: Props) => {
   const {
     placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection, handleKeyDown, onFocus,
     neverEmpty,
+    isOpen, setIsOpen,
   } = props;
 
   const previousPlaceholder = usePrevious(placeholder);
@@ -175,6 +178,15 @@ const StandardSearch = (props: Props) => {
     }
   }, [searchEl, initialQuery, hasSelection, placeholder, previousPlaceholder]);
 
+  const closeDropdown = (e: React.MouseEvent) => {
+    if (isOpen) {
+      e.preventDefault();
+      e.stopPropagation();
+      (document.activeElement as HTMLElement).blur();
+      setIsOpen(false)
+    }
+  }
+
   return (
     <SearchContainer
       className={'react-panel-search-search-bar-container'}
@@ -210,8 +222,10 @@ const StandardSearch = (props: Props) => {
         className={'react-panel-search-search-bar-dropdown-arrow'}
         style={{
           display: 'block',
+          transform: isOpen ? 'rotate(180deg)' : undefined,
         }}
         dangerouslySetInnerHTML={{__html: chevronSVG}}
+        onClick={closeDropdown}
       />
     </SearchContainer>
   );
