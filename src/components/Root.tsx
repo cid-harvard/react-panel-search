@@ -185,6 +185,7 @@ interface Props {
   showCount: boolean;
   resultsIdentation: number;
   neverEmpty: boolean;
+  maxResults: number | null;
 }
 
 interface State {
@@ -200,7 +201,7 @@ export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
-    neverEmpty,
+    neverEmpty, maxResults,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -343,79 +344,83 @@ export default (props: Props) => {
     const getChildren = (index: number, parent: Datum['parent_id'], depth: number) => {
       const elms: React.ReactElement<any>[] = [];
       sortBy(levels[index].data, ['name']).forEach((child) => {
-        if (child.parent_id === parent &&
-            !renderedIds.includes(child.id) &&
-            child.title.toLowerCase().includes(state.searchQuery.toLowerCase())
-          ) {
-          renderedIds.push(child.id);
-          let childElms: React.ReactElement<any>[] | null;
-          if (levels[index + 1] && levels[index + 1].data) {
-            childElms = getChildren(index + 1, child.id, depth + 1);
-          } else {
-            childElms = null;
-          }
-          const childList = childElms && childElms.length ? (
-            <ul
-              className={'react-panel-search-list-inner-container'}
-            >
-              {childElms}
-            </ul>
-          ) : null;
-          const onContinue = () => {
-            const targetIndex = levels.findIndex(({level}) => level === state.level);
-            updateState({
-              ...state, level: levels[targetIndex + 1].level, parent: child.id, 
-              highlightedIndex: 0, selected: null, searchQuery: '',
-            })
-            if (onTraverseLevel !== undefined) {
-              onTraverseLevel(child, Direction.desc);
+        if (!maxResults || renderedIds.length < maxResults) {
+          if (child.parent_id === parent &&
+              !renderedIds.includes(child.id) &&
+              child.title.toLowerCase().includes(state.searchQuery.toLowerCase())
+            ) {
+            renderedIds.push(child.id);
+            let childElms: React.ReactElement<any>[] | null;
+            if (levels[index + 1] && levels[index + 1].data) {
+              childElms = getChildren(index + 1, child.id, depth + 1);
+            } else {
+              childElms = null;
             }
-          }
-          const onSearch = () => {
-            selectDatum(child)
-          }
-          const onMouseEnter = () => {
-            if (onHover) {
-              onHover(child);
+            const childList = childElms && childElms.length ? (
+              <ul
+                className={'react-panel-search-list-inner-container'}
+              >
+                {childElms}
+              </ul>
+            ) : null;
+            const onContinue = () => {
+              const targetIndex = levels.findIndex(({level}) => level === state.level);
+              updateState({
+                ...state, level: levels[targetIndex + 1].level, parent: child.id, 
+                highlightedIndex: 0, selected: null, searchQuery: '',
+              })
+              if (onTraverseLevel !== undefined) {
+                onTraverseLevel(child, Direction.desc);
+              }
             }
+            const onSearch = () => {
+              selectDatum(child)
+            }
+            const onMouseEnter = () => {
+              if (onHover) {
+                onHover(child);
+              }
+            }
+            const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
+              <SearchButton
+                onClick={onContinue}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                className={'react-panel-search-list-item traverse-only'}
+                style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
+              >
+                {child.title}
+              </SearchButton>
+            ) : (
+              <SearchButton
+                onClick={onSearch}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                className={'react-panel-search-list-item'}
+                style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
+              >
+                {child.title}
+              </SearchButton>
+            )
+            elms.push(
+              <li
+                className={'react-panel-search-list-item-container'}
+                key={'search-' + child.title + child.id}
+              >
+                {resultElm}
+                {childList}
+              </li>
+            );
           }
-          const resultElm = disallowSelectionLevels && disallowSelectionLevels.includes(levels[index].level) ? (
-            <SearchButton
-              onClick={onContinue}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-              className={'react-panel-search-list-item traverse-only'}
-              style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
-            >
-              {child.title}
-            </SearchButton>
-          ) : (
-            <SearchButton
-              onClick={onSearch}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-              className={'react-panel-search-list-item'}
-              style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
-            >
-              {child.title}
-            </SearchButton>
-          )
-          elms.push(
-            <li
-              className={'react-panel-search-list-item-container'}
-              key={'search-' + child.title + child.id}
-            >
-              {resultElm}
-              {childList}
-            </li>
-          );
         }
       });
       return elms;
     }
     levels.forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
-        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(state.searchQuery.toLowerCase())) {
+        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(state.searchQuery.toLowerCase()) && (
+              !maxResults || renderedIds.length < maxResults
+            )) {
           renderedIds.push(datum.id);
           let childElms: React.ReactElement<any>[] | null;
           if (levels[i + 1] && levels[i + 1].data) {

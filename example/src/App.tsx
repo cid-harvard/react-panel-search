@@ -83,6 +83,7 @@ const App = () => {
           selectedValue={selectedValue}
           showCount={true}
           resultsIdentation={1.75}
+          maxResults={500}
         />
       </SearchContainer>
     </Root>

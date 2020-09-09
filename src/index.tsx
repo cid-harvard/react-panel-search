@@ -44,12 +44,14 @@ interface Props {
   showCount?: boolean;
   resultsIdentation?: number;
   neverEmpty?: boolean;
+  maxResults?: number;
 }
 
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
+    maxResults,
   } = props;
   const levels: Level[] = [];
   sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
@@ -78,6 +80,7 @@ const PanelSearch = (props: Props) => {
         showCount={showCount ? showCount : false}
         resultsIdentation={resultsIdentation !== undefined ? resultsIdentation : 1}
         neverEmpty={neverEmpty ? neverEmpty : false}
+        maxResults={maxResults ? maxResults : null}
       />
     );
   } else {
