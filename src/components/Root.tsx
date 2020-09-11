@@ -101,6 +101,10 @@ const NavButton = styled.button`
     cursor: pointer;
   }
 
+  &:focus {
+    background-color: #f3f3f3;
+  }
+
   svg {
     width: 100%;
     height: 100%;
@@ -153,7 +157,7 @@ const ButtonBase = styled.button`
   text-align: left;
   box-sizing: border-box;
 
-  &:hover {
+  &:hover, &:focus {
     cursor: pointer;
     background-color: #f3f3f3;
   }
