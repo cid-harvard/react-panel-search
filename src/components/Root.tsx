@@ -271,13 +271,13 @@ export default (props: Props) => {
     }
   }, [selectedValue, previousSelectedValue]);
 
+  const closeDropdown = () => setState(current => ({...current, highlightedIndex: 0, isOpen: false}));
   const rootRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     let el: HTMLDivElement;
     const preventClickFromPropagating = (e: MouseEvent) => {
       e.stopPropagation();
     };
-    const closeDropdown = () => setState(current => ({...current, highlightedIndex: 0, isOpen: false}));
     if (rootRef.current !== null) {
       el = rootRef.current;
       el.addEventListener('mousedown', preventClickFromPropagating);
@@ -290,11 +290,20 @@ export default (props: Props) => {
         el.removeEventListener('mousedown', preventClickFromPropagating);
       }
     };
-  }, [rootRef]);
+  }, [rootRef, closeDropdown]);
 
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const closeOnEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeDropdown();
+        const focusedElement = document.activeElement as HTMLElement;
+        if (focusedElement) {
+          focusedElement.blur();
+        }
+      }
+    }
     const node = resultsRef.current;
     if (node) {
       const liElms = Array.from(node.querySelectorAll<HTMLButtonElement>('li .react-panel-search-list-item'));
@@ -327,8 +336,13 @@ export default (props: Props) => {
           node.scrollTop = highlightedTop;
         }
       }
+      document.addEventListener('keydown', closeOnEsc);
     }
-  }, [state, resultsRef]);
+    return () => {
+      document.removeEventListener('keydown', closeOnEsc);
+    }
+
+  }, [state, resultsRef, closeDropdown]);
 
 
   const onMouseLeave = () => {
