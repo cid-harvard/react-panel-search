@@ -532,7 +532,7 @@ export default (props: Props) => {
         : `No results found for ${state.searchQuery}`;
       filteredElms.push(
         <li
-          className={'react-panel-search-list-item-container'}
+          className={'react-panel-search-list-item-container react-panel-search-list-no-results'}
         >
           <NoResults>{noResultsText}</NoResults>
         </li>
