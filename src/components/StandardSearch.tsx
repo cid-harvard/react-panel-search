@@ -1,7 +1,7 @@
 import { debounce } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
-import usePrevious from 'react-use-previous-hook';
+import {usePrevious} from 'react-use';
 import raw from 'raw.macro';
 
 const magnifyingGlassSVG = raw('../assets/magnifying-glass.svg');

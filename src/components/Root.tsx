@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {Level, Datum} from '../'
 import StandardSearch from './StandardSearch';
 import sortBy from 'lodash/sortBy';
-import usePrevious from 'react-use-previous-hook';
+import {usePrevious} from 'react-use';
 import styled from 'styled-components/macro';
 import raw from 'raw.macro';
 
