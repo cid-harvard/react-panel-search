@@ -276,7 +276,9 @@ export default (props: Props) => {
   useEffect(() => {
     let el: HTMLDivElement;
     const preventClickFromPropagating = (e: MouseEvent) => {
-      e.stopPropagation();
+      if (state.isOpen) {
+        e.stopPropagation();
+      }
     };
     if (rootRef.current !== null) {
       el = rootRef.current;
