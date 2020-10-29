@@ -163,6 +163,11 @@ const ButtonBase = styled.button`
   }
 `;
 
+const NoResults = styled.div`
+  padding: 0.75rem 4rem 0.75rem 2rem;
+  font-size: 0.8rem;
+`;
+
 const PanelButton = styled(ButtonBase)`
   grid-row: 1;
   grid-column: 1 / 3;
@@ -191,6 +196,7 @@ interface Props {
   neverEmpty: boolean;
   maxResults: number | null;
   focusOnRender: boolean;
+  noResultsFoundFormatter: undefined | ((value: string) => string);
 }
 
 interface State {
@@ -206,7 +212,7 @@ export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
-    neverEmpty, maxResults, focusOnRender,
+    neverEmpty, maxResults, focusOnRender, noResultsFoundFormatter,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -520,6 +526,18 @@ export default (props: Props) => {
         }
       });
     });
+    if (filteredElms.length === 0) {
+      const noResultsText = noResultsFoundFormatter
+        ? noResultsFoundFormatter(state.searchQuery)
+        : `No results found for ${state.searchQuery}`;
+      filteredElms.push(
+        <li
+          className={'react-panel-search-list-item-container'}
+        >
+          <NoResults>{noResultsText}</NoResults>
+        </li>
+      )
+    }
     listOutput = (
       <ul
         className={'react-panel-search-list-root-container'}
