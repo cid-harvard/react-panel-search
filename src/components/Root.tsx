@@ -382,7 +382,7 @@ export default (props: Props) => {
               </ul>
             ) : null;
             const onContinue = () => {
-              const targetIndex = levels.findIndex(({level}) => level === state.level);
+              const targetIndex = levels.findIndex(({level}) => level === child.level);
               updateState({
                 ...state, level: levels[targetIndex + 1].level, parent: child.id, 
                 highlightedIndex: 0, selected: null, searchQuery: '',
@@ -454,7 +454,7 @@ export default (props: Props) => {
             </ul>
           ) : null;
           const onContinue = () => {
-            const targetIndex = levels.findIndex(({level}) => level === state.level);
+            const targetIndex = levels.findIndex(target => target.level === level);
             updateState({
               ...state, level: levels[targetIndex + 1].level, parent: datum.id, 
               highlightedIndex: 0, selected: null, searchQuery: '',
