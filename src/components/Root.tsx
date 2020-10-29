@@ -374,7 +374,7 @@ export default (props: Props) => {
         if (!maxResults || renderedIds.length < maxResults) {
           let keywordMatch: boolean;
           if (child.keywords && child.keywords.length) {
-            keywordMatch = !!child.keywords.find(k => k.toLowerCase() === state.searchQuery.toLowerCase());
+            keywordMatch = !!child.keywords.find(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
           } else {
             keywordMatch = false;
           }
@@ -453,7 +453,7 @@ export default (props: Props) => {
       sortBy(data, ['name']).forEach((datum) => {
         let keywordMatch: boolean;
         if (datum.keywords && datum.keywords.length) {
-          keywordMatch = !!datum.keywords.find(k => k.toLowerCase() === state.searchQuery.toLowerCase());
+          keywordMatch = !!datum.keywords.find(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
         } else {
           keywordMatch = false;
         }
@@ -533,6 +533,7 @@ export default (props: Props) => {
       filteredElms.push(
         <li
           className={'react-panel-search-list-item-container react-panel-search-list-no-results'}
+          key={'search-results-no-reasults-key'}
         >
           <NoResults>{noResultsText}</NoResults>
         </li>
