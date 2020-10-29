@@ -47,13 +47,14 @@ interface Props {
   resultsIdentation?: number;
   neverEmpty?: boolean;
   maxResults?: number;
+  focusOnRender?: boolean;
 }
 
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
-    maxResults,
+    maxResults, focusOnRender,
   } = props;
   const levels: Level[] = [];
   sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
@@ -83,6 +84,7 @@ const PanelSearch = (props: Props) => {
         resultsIdentation={resultsIdentation !== undefined ? resultsIdentation : 1}
         neverEmpty={neverEmpty ? neverEmpty : false}
         maxResults={maxResults ? maxResults : null}
+        focusOnRender={focusOnRender ? focusOnRender : false}
       />
     );
   } else {

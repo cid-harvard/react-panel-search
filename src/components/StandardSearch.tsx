@@ -114,12 +114,13 @@ interface Props {
   type?: string;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  focusOnRender: boolean;
 }
 
 const StandardSearch = (props: Props) => {
   const {
     placeholder, setSearchQuery, initialQuery, type, onClear, hasSelection, handleKeyDown, onFocus,
-    neverEmpty,
+    neverEmpty, focusOnRender,
     isOpen, setIsOpen,
   } = props;
 
@@ -177,6 +178,12 @@ const StandardSearch = (props: Props) => {
       }
     }
   }, [searchEl, initialQuery, hasSelection, placeholder, previousPlaceholder]);
+
+  useEffect(() => {
+    if (focusOnRender && searchEl && searchEl.current) {
+      searchEl.current.focus();
+    }
+  }, [focusOnRender, searchEl])
 
   const closeDropdown = (e: React.MouseEvent) => {
     if (isOpen) {

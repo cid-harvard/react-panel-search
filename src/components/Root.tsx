@@ -190,6 +190,7 @@ interface Props {
   resultsIdentation: number;
   neverEmpty: boolean;
   maxResults: number | null;
+  focusOnRender: boolean;
 }
 
 interface State {
@@ -205,7 +206,7 @@ export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
-    neverEmpty, maxResults,
+    neverEmpty, maxResults, focusOnRender,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -696,6 +697,7 @@ export default (props: Props) => {
           onFocus={() => updateState({...state, isOpen: true})}
           isOpen={state.isOpen}
           setIsOpen={(isOpen) => updateState({...state, isOpen})}
+          focusOnRender={focusOnRender}
         />
       </SearchBar>
       {searchResults}

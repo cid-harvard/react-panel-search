@@ -52,6 +52,7 @@ The only required prop for react-panel-search is `data`, which is an array of ty
 - **resultsIdentation** *(optional)*: `number` Value, in `rem`, of how much to indent each tier of search results. Defaults to `1`.
 - **neverEmpty** *(optional)*: `boolean` If true, the dropdown can never be null and will always be equal to an acceptable value in the dataset. If no initial value is given via `selectedValue` then the first acceptable value in the dataset will be used. Defaults to `false`.
 - **maxResults** *(optional)*: `number` Set the maximum number of results to display when the user enters a search term. By default no limit is set.
+- **focusOnRender** *(optional)*: `boolean` Focus the dropdown as soon as it is rendered. Defaults to `false`.
 
 ## Usage
 
