@@ -19,6 +19,8 @@ export interface Datum {
   // level tree. Top level parent must have a
   // parent_id of null
   parent_id: number | string | null;
+  // optional keywords will also be searched
+  keywords?: string[];
 }
 
 // Levels are groupings of all datum

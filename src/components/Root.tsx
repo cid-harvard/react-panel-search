@@ -365,9 +365,15 @@ export default (props: Props) => {
       const elms: React.ReactElement<any>[] = [];
       sortBy(levels[index].data, ['name']).forEach((child) => {
         if (!maxResults || renderedIds.length < maxResults) {
+          let keywordMatch: boolean;
+          if (child.keywords && child.keywords.length) {
+            keywordMatch = !!child.keywords.find(k => k.toLowerCase() === state.searchQuery.toLowerCase());
+          } else {
+            keywordMatch = false;
+          }
           if (child.parent_id === parent &&
               !renderedIds.includes(child.id) &&
-              child.title.toLowerCase().includes(state.searchQuery.toLowerCase())
+              (child.title.toLowerCase().includes(state.searchQuery.toLowerCase()) || keywordMatch)
             ) {
             renderedIds.push(child.id);
             let childElms: React.ReactElement<any>[] | null;
@@ -438,7 +444,14 @@ export default (props: Props) => {
     }
     levels.forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
-        if (!renderedIds.includes(datum.id) && datum.title.toLowerCase().includes(state.searchQuery.toLowerCase()) && (
+        let keywordMatch: boolean;
+        if (datum.keywords && datum.keywords.length) {
+          keywordMatch = !!datum.keywords.find(k => k.toLowerCase() === state.searchQuery.toLowerCase());
+        } else {
+          keywordMatch = false;
+        }
+        if (!renderedIds.includes(datum.id) &&
+            (datum.title.toLowerCase().includes(state.searchQuery.toLowerCase()) || keywordMatch) && (
               !maxResults || renderedIds.length < maxResults
             )) {
           renderedIds.push(datum.id);
