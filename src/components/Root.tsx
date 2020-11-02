@@ -31,6 +31,12 @@ const Container = styled.div`
   .react-panel-search-highlighted-item {
     background-color: #f3f3f3;
   }
+
+  &.react-panel-search-has-selection {
+    input::placeholder {
+      opacity: 1;
+    }
+  }
 `;
 
 const SearchBar = styled.div`
@@ -690,10 +696,12 @@ export default (props: Props) => {
     </SearchResults>
   ) : null;
 
+  const selectedClass = state.selected ? ' react-panel-search-has-selection' : '';
+
   return (
     <Container
       ref={rootRef}
-      className={'react-panel-search-root-container'}
+      className={'react-panel-search-root-container' + selectedClass}
       style={{zIndex: state.isOpen ? 2000 : undefined}}
     >
       <SearchBar
