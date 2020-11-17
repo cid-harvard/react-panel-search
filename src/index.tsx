@@ -9,7 +9,7 @@ export interface Datum {
   // levels can be either numbers or strings,
   // order is based on value high-to low then
   // alphabetical A-Z
-  level: number | string;
+  level: number | string | null;
   // all data points are expected to have the
   // same hierarchy.
   // i.e. grandparent -> parent -> child
@@ -57,23 +57,30 @@ const PanelSearch = (props: Props) => {
     onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
     maxResults, focusOnRender, noResultsFoundFormatter,
   } = props;
+  const topLevelItems: Datum[] = [];
   const levels: Level[] = [];
   sortBy(data, ({title}) => title.toLowerCase()).forEach(datum => {
-    let targetIndex = levels.findIndex(({level}) => level === datum.level);
-    if (targetIndex === -1) {
-      levels.push({
-        level: datum.level,
-        data: [datum],
-      })
+    if (datum.level !== null) {
+      let targetIndex = levels.findIndex(({level}) => level === datum.level);
+      if (targetIndex === -1) {
+        levels.push({
+          level: datum.level,
+          data: [datum],
+        })
+      } else {
+        levels[targetIndex].data.push(datum);
+      }
     } else {
-      levels[targetIndex].data.push(datum);
+      topLevelItems.push(datum)
     }
   });
   if (levels && levels.length) {
     const sortedLevels = sortBy(levels, ['level']);
+    console.log({sortedLevels, topLevelItems});
     return (
       <Root
         levels={sortedLevels}
+        topLevelItems={topLevelItems}
         onSelect={onSelect}
         onHover={onHover}
         onTraverseLevel={onTraverseLevel}

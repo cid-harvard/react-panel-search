@@ -38,7 +38,7 @@ The only required prop for react-panel-search is `data`, which is an array of ty
 - **data**: `Datum[]` An array of type Datum -
     - **id**: `number | string` A unique identifier for this particular datum
     - **title**: `string` The title that will be rendered
-    - **level**: `number | string` The hierarchal level of this datum. The order of levels is automatically calculated based on value going from numeric high-to-low then alphabetical A-Z
+    - **level**: `number | string | null` The hierarchal level of this datum. The order of levels is automatically calculated based on value going from numeric high-to-low then alphabetical A-Z. If the value is set to `null` it will be considered a [top-level item](#optionaltoplevelitems).
     - **parent_id**: `number | string | null` The id of the parent value, one level higher than the current datum's level. For a top level datum, this should be `null`
     - **keywords** *(optional)*: `string[]` An array of strings that will also be checked when returning results
 - **topLevelTitle** *(optional)*: `string` The title text that will appear in the panel when at the highest tier
@@ -55,7 +55,13 @@ The only required prop for react-panel-search is `data`, which is an array of ty
 - **focusOnRender** *(optional)*: `boolean` Focus the dropdown as soon as it is rendered. Defaults to `false`.
 - **noResultsFoundFormatter** *(optional)*: `(value: string) => string` Callback that receives the current search query and returns a string that will be shown when no results are found. Defaults to `No results found for { query }`
 
-## Usage
+<a name="optionaltoplevelitems"/>
+
+## Optional top level items
+
+Top-level items can easily be added to react-panel-search. Top-level items are items that appear above the dropdowns title and contain no child elements. See the [live example](https://cid-harvard.github.io/react-panel-search/) for an idea of what this looks like. To include top-level items, an individual datum sent in the `data` prop should have both the `level` and `parent_id` set to `null`.
+
+## Styling
 
 react-panel-search comes out of the box with generic styling. However static class names have been added to all of the elements that make up the component to allow for full customizability of its appearance.
 

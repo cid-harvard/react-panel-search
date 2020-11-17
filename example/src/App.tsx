@@ -66,6 +66,18 @@ const App = () => {
     }
   })
 
+  data.push({
+    id: 'top-level-industries-id',
+    title: 'Top Level Industries',
+    level: null,
+    parent_id: null,
+  },{
+    id: 'nearby-industries-id',
+    title: 'Nearby Industries',
+    level: null,
+    parent_id: null,
+  },)
+
   const selectedText = selectedValue ? 'Selected: ' + selectedValue.title : 'Nothing selected';
   const clearButton  = selectedValue
     ? <ClearButton onClick={() => setSelectedValue(null)}>Clear</ClearButton>

@@ -190,6 +190,7 @@ export enum Direction {
 
 interface Props {
   levels: Level[];
+  topLevelItems: Datum[];
   onSelect: undefined | ((value: Datum | null) => void);
   onTraverseLevel: undefined | ((value: Datum, direction: Direction) => void);
   onHover: undefined | ((value: Datum | null) => void);
@@ -218,7 +219,7 @@ export default (props: Props) => {
   const {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
-    neverEmpty, maxResults, focusOnRender, noResultsFoundFormatter,
+    neverEmpty, maxResults, focusOnRender, noResultsFoundFormatter, topLevelItems,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -455,7 +456,7 @@ export default (props: Props) => {
       });
       return elms;
     }
-    levels.forEach(({level, data}, i) => {
+    [{level: null, data: topLevelItems}, ...levels].forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
         let keywordMatch: boolean;
         if (datum.keywords && datum.keywords.length) {
@@ -608,6 +609,41 @@ export default (props: Props) => {
       );
     });
 
+    let topLevelListItems: React.ReactElement | null;
+    if (topLevelItems.length && targetIndex === 0) {
+      const items = topLevelItems.map(d => {
+        const onMouseEnter = () => {
+          if (onHover) {
+            onHover(d);
+          }
+        }
+        return (
+          <PanelItem
+            key={d.id}
+            className={'react-panel-search-panel-item-container'}
+          >
+            <PanelButton
+              onClick={() => selectDatum(d)}
+              className={'react-panel-search-list-item'}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+            >
+              {d.title}
+            </PanelButton>
+          </PanelItem>
+        );
+      });
+      topLevelListItems = items.length ? (
+        <ul
+          className={'react-panel-search-panel-list-top-items-container'}
+        >
+          {items}
+        </ul>
+      ) : null;
+    } else {
+      topLevelListItems = null;
+    }
+
     const parentDatum = parent === null || targetIndex === 0
       ? undefined : levels[targetIndex - 1].data.find(({id}) => id === state.parent);
 
@@ -655,9 +691,11 @@ export default (props: Props) => {
     )
     listOutput = (
       <React.Fragment>
+        {topLevelListItems}
         {breadCrumb}
         <ul
-          className={'react-panel-search-panel-list-root-container'}
+          className={'react-panel-search-panel-list-root-container' + (topLevelListItems
+            ? 'react-panel-search-panel-list-has-top-level-items' : '')}
         >
             {listItems}
         </ul>
