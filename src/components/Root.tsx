@@ -204,6 +204,7 @@ interface Props {
   maxResults: number | null;
   focusOnRender: boolean;
   noResultsFoundFormatter: undefined | ((value: string) => string);
+  onClose: () => void;
 }
 
 interface State {
@@ -220,6 +221,7 @@ export default (props: Props) => {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
     neverEmpty, maxResults, focusOnRender, noResultsFoundFormatter, topLevelItems,
+    onClose,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -359,6 +361,17 @@ export default (props: Props) => {
     }
 
   }, [state, resultsRef, closeDropdown]);
+
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+     firstRender.current = false; 
+    } else {
+      if (!state.isOpen) {
+        onClose();
+      }
+    }
+  }, [state.isOpen, onClose, firstRender])
 
 
   const onMouseLeave = () => {

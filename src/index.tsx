@@ -49,13 +49,14 @@ interface Props {
   maxResults?: number;
   focusOnRender?: boolean;
   noResultsFoundFormatter?: (value: string) => string;
+  onClose?: () => void;
 }
 
 const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
-    maxResults, focusOnRender, noResultsFoundFormatter,
+    maxResults, focusOnRender, noResultsFoundFormatter, onClose,
   } = props;
   const topLevelItems: Datum[] = [];
   const levels: Level[] = [];
@@ -76,7 +77,6 @@ const PanelSearch = (props: Props) => {
   });
   if (levels && levels.length) {
     const sortedLevels = sortBy(levels, ['level']);
-    console.log({sortedLevels, topLevelItems});
     return (
       <Root
         levels={sortedLevels}
@@ -94,6 +94,7 @@ const PanelSearch = (props: Props) => {
         maxResults={maxResults ? maxResults : null}
         focusOnRender={focusOnRender ? focusOnRender : false}
         noResultsFoundFormatter={noResultsFoundFormatter}
+        onClose={onClose ? onClose : () => {}}
       />
     );
   } else {
