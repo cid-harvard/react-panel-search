@@ -469,7 +469,7 @@ export default (props: Props) => {
       });
       return elms;
     }
-    [{level: null, data: topLevelItems}, ...levels].forEach(({level, data}, i) => {
+    [...levels, {level: null, data: topLevelItems}].forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
         let keywordMatch: boolean;
         if (datum.keywords && datum.keywords.length) {
