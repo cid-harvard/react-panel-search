@@ -203,7 +203,8 @@ interface Props {
   neverEmpty: boolean;
   maxResults: number | null;
   focusOnRender: boolean;
-  noResultsFoundFormatter: undefined | ((value: string) => string);
+  noResultsFoundFormatter: undefined | ((value: string) => React.ReactNode);
+  matchingKeywordFormatter: undefined | ((matched: string[], rest: string[]) => React.ReactNode);
   onClose: () => void;
 }
 
@@ -221,7 +222,7 @@ export default (props: Props) => {
     levels, onSelect, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, onHover, defaultPlaceholderText, showCount, resultsIdentation,
     neverEmpty, maxResults, focusOnRender, noResultsFoundFormatter, topLevelItems,
-    onClose,
+    matchingKeywordFormatter, onClose,
   } = props;
 
   let initialSelectedValue: Datum | null = selectedValue;
@@ -393,10 +394,16 @@ export default (props: Props) => {
       sortBy(levels[index].data, ['name']).forEach((child) => {
         if (!maxResults || renderedIds.length < maxResults) {
           let keywordMatch: boolean;
+          let keywordResultElm: React.ReactNode | null;
           if (child.keywords && child.keywords.length) {
-            keywordMatch = !!child.keywords.find(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+            const matchingKeywords = child.keywords.filter(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+            const nonMatchingKeywords = child.keywords.filter(k => !k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+            keywordMatch = matchingKeywords.length !== 0;
+            keywordResultElm = matchingKeywordFormatter
+              ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords) : null;
           } else {
             keywordMatch = false;
+            keywordResultElm = null;
           }
           if (child.parent_id === parent &&
               !renderedIds.includes(child.id) &&
@@ -443,6 +450,7 @@ export default (props: Props) => {
                 style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
               >
                 {child.title}
+                {keywordResultElm}
               </SearchButton>
             ) : (
               <SearchButton
@@ -453,6 +461,7 @@ export default (props: Props) => {
                 style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
               >
                 {child.title}
+                {keywordResultElm}
               </SearchButton>
             )
             elms.push(
@@ -472,10 +481,16 @@ export default (props: Props) => {
     [...levels, {level: null, data: topLevelItems}].forEach(({level, data}, i) => {
       sortBy(data, ['name']).forEach((datum) => {
         let keywordMatch: boolean;
+        let keywordResultElm: React.ReactNode | null;
         if (datum.keywords && datum.keywords.length) {
-          keywordMatch = !!datum.keywords.find(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+          const matchingKeywords = datum.keywords.filter(k => k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+          const nonMatchingKeywords = datum.keywords.filter(k => !k.toLowerCase().includes(state.searchQuery.toLowerCase()));
+          keywordMatch = matchingKeywords.length !== 0;
+          keywordResultElm = matchingKeywordFormatter
+            ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords) : null;
         } else {
           keywordMatch = false;
+          keywordResultElm = null;
         }
         if (!renderedIds.includes(datum.id) &&
             (datum.title.toLowerCase().includes(state.searchQuery.toLowerCase()) || keywordMatch) && (
@@ -522,6 +537,7 @@ export default (props: Props) => {
               style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {datum.title}
+              {keywordResultElm}
             </SearchButton>
           ) : (
             <SearchButton
@@ -532,6 +548,7 @@ export default (props: Props) => {
               style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
               {datum.title}
+              {keywordResultElm}
             </SearchButton>
           )
           filteredElms.push(

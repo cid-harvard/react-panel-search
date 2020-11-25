@@ -49,6 +49,7 @@ interface Props {
   maxResults?: number;
   focusOnRender?: boolean;
   noResultsFoundFormatter?: (value: string) => string;
+  matchingKeywordFormatter?: (matched: string[], rest: string[]) => React.ReactNode;
   onClose?: () => void;
 }
 
@@ -56,7 +57,7 @@ const PanelSearch = (props: Props) => {
   const {
     data, onSelect, onHover, selectedValue, topLevelTitle, disallowSelectionLevels,
     onTraverseLevel, defaultPlaceholderText, showCount, resultsIdentation, neverEmpty,
-    maxResults, focusOnRender, noResultsFoundFormatter, onClose,
+    maxResults, focusOnRender, noResultsFoundFormatter, matchingKeywordFormatter, onClose,
   } = props;
   const topLevelItems: Datum[] = [];
   const levels: Level[] = [];
@@ -94,6 +95,7 @@ const PanelSearch = (props: Props) => {
         maxResults={maxResults ? maxResults : null}
         focusOnRender={focusOnRender ? focusOnRender : false}
         noResultsFoundFormatter={noResultsFoundFormatter}
+        matchingKeywordFormatter={matchingKeywordFormatter}
         onClose={onClose ? onClose : () => {}}
       />
     );

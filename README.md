@@ -53,7 +53,8 @@ The only required prop for react-panel-search is `data`, which is an array of ty
 - **neverEmpty** *(optional)*: `boolean` If true, the dropdown can never be null and will always be equal to an acceptable value in the dataset. If no initial value is given via `selectedValue` then the first acceptable value in the dataset will be used. Defaults to `false`.
 - **maxResults** *(optional)*: `number` Set the maximum number of results to display when the user enters a search term. By default no limit is set.
 - **focusOnRender** *(optional)*: `boolean` Focus the dropdown as soon as it is rendered. Defaults to `false`.
-- **noResultsFoundFormatter** *(optional)*: `(value: string) => string` Callback that receives the current search query and returns a string that will be shown when no results are found. Defaults to `No results found for { query }`
+- **noResultsFoundFormatter** *(optional)*: `(value: string) => React.ReactNode` Callback that receives the current search query and returns a `React.ReactNode` that will be shown when no results are found. Defaults to a string of `No results found for { query }`
+- **matchingKeywordFormatter** *(optional)*: `(matched: string[], rest: string[]) => React.ReactNode` Callback that receives the any matched keywords as well as the rest of the unmatched keywords for a given item that matches a query and returns a `React.ReactNode` that will be displayed underneath the restult. Defaults to `null`
 - **onClose** *(optional)*: `() => void` Callback function for when the dropdown is closed.
 
 <a name="optionaltoplevelitems"/>
