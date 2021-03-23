@@ -49,7 +49,7 @@ interface Props {
   maxResults?: number;
   focusOnRender?: boolean;
   noResultsFoundFormatter?: (value: string) => string;
-  matchingKeywordFormatter?: (matched: string[], rest: string[]) => React.ReactNode;
+  matchingKeywordFormatter?: (matched: string[], rest: string[], query: string) => React.ReactNode;
   onClose?: () => void;
 }
 

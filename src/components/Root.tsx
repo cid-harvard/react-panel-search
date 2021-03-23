@@ -204,7 +204,7 @@ interface Props {
   maxResults: number | null;
   focusOnRender: boolean;
   noResultsFoundFormatter: undefined | ((value: string) => React.ReactNode);
-  matchingKeywordFormatter: undefined | ((matched: string[], rest: string[]) => React.ReactNode);
+  matchingKeywordFormatter: undefined | ((matched: string[], rest: string[], query: string) => React.ReactNode);
   onClose: () => void;
 }
 
@@ -384,6 +384,7 @@ export default (props: Props) => {
   let listOutput: React.ReactElement<any>;
 
   if (state.searchQuery.length) {
+    const safeQuery = new RegExp(state.searchQuery.replace(/[^\w\s]/gi, '').trim(), 'gi');
     // Loop through each filtered level to make element list
     // For each parent, find the children in the next level down if not the last level
     // For each level, check if a parent exists, if so skip it
@@ -400,7 +401,7 @@ export default (props: Props) => {
             const nonMatchingKeywords = child.keywords.filter(k => !k.toLowerCase().includes(state.searchQuery.toLowerCase()));
             keywordMatch = matchingKeywords.length !== 0;
             keywordResultElm = matchingKeywordFormatter
-              ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords) : null;
+              ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords, state.searchQuery) : null;
           } else {
             keywordMatch = false;
             keywordResultElm = null;
@@ -449,7 +450,11 @@ export default (props: Props) => {
                 className={'react-panel-search-list-item traverse-only'}
                 style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
               >
-                {child.title}
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: child.title.replace(safeQuery, (match: string) => `<strong>${match}</strong>`),
+                  }}
+                />
                 {keywordResultElm}
               </SearchButton>
             ) : (
@@ -460,7 +465,11 @@ export default (props: Props) => {
                 className={'react-panel-search-list-item'}
                 style={{paddingLeft: (depth * resultsIdentation) + 'rem', paddingRight: resultsIdentation + 'rem'}}
               >
-                {child.title}
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: child.title.replace(safeQuery, (match: string) => `<strong>${match}</strong>`),
+                  }}
+                />
                 {keywordResultElm}
               </SearchButton>
             )
@@ -487,7 +496,7 @@ export default (props: Props) => {
           const nonMatchingKeywords = datum.keywords.filter(k => !k.toLowerCase().includes(state.searchQuery.toLowerCase()));
           keywordMatch = matchingKeywords.length !== 0;
           keywordResultElm = matchingKeywordFormatter
-            ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords) : null;
+            ? matchingKeywordFormatter(matchingKeywords, nonMatchingKeywords, state.searchQuery) : null;
         } else {
           keywordMatch = false;
           keywordResultElm = null;
@@ -536,7 +545,11 @@ export default (props: Props) => {
               className={'react-panel-search-list-item traverse-only'}
               style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
-              {datum.title}
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: datum.title.replace(safeQuery, (match: string) => `<strong>${match}</strong>`),
+                }}
+              />
               {keywordResultElm}
             </SearchButton>
           ) : (
@@ -547,7 +560,11 @@ export default (props: Props) => {
               className={'react-panel-search-list-item'}
               style={{paddingLeft: resultsIdentation + 'rem', paddingRight: resultsIdentation + 'rem'}}
             >
-              {datum.title}
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: datum.title.replace(safeQuery, (match: string) => `<strong>${match}</strong>`),
+                }}
+              />
               {keywordResultElm}
             </SearchButton>
           )

@@ -57,12 +57,28 @@ const rawData: NaicsDatum[] = JSON.parse(raw('./naics_data.json'));
 const App = () => {
   const [selectedValue, setSelectedValue] = useState<Datum | null>(null);
 
-  const data: Datum[] = rawData.map(datum => {
+  const data: Datum[] = rawData.map((datum, i) => {
+    const keywords: string[] = [];
+
+    if (i === 5) {
+      keywords.push('Apple', 'Orange', 'Banana', 'Mango', 'Pear', 'Tangerine', 'Asparagus', 'Potato')
+    }
+    if (i === 645) {
+      keywords.push('Ford', 'Mustang', 'Hyundai', 'Subaru', 'Honda', 'Toyota', 'BMW', 'Tesla')
+    }
+    if (i === 800) {
+      keywords.push('Evergreen', 'Maple')
+    }
+    if (i === 48) {
+      keywords.push(datum.title)
+    }
+
     return {
       id: datum.naics_id,
       title: datum.title,
       level: datum.level,
       parent_id: datum.parent_id,
+      keywords,
     }
   })
 
@@ -83,6 +99,16 @@ const App = () => {
     ? <ClearButton onClick={() => setSelectedValue(null)}>Clear</ClearButton>
     : <ClearButton onClick={() => setSelectedValue(data[Math.floor(Math.random() * data.length)])}>Set value randomly</ClearButton>
 
+  const matchingKeywordFormatter = (match: string[], rest: string[], query: string) => {
+    const safeQuery = new RegExp(query.replace(/[^\w\s]/gi, '').trim(), 'gi');
+    if (match.length || rest.length) {
+      const __html = `Includes ${[...match, ...rest].join(', ')}`.replace(safeQuery, (match: string) => `<strong>${match}</strong>`);
+      return <div><small dangerouslySetInnerHTML={{__html}} /></div>
+    } else {
+      return null;
+    }
+  }
+
   return (
     <Root>
       <PageTitle>{selectedText} {clearButton}</PageTitle>
@@ -96,6 +122,7 @@ const App = () => {
           showCount={true}
           resultsIdentation={1.75}
           maxResults={500}
+          matchingKeywordFormatter={matchingKeywordFormatter}
         />
       </SearchContainer>
     </Root>
