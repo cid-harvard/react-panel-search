@@ -284,7 +284,16 @@ export default (props: Props) => {
     if (previousSelectedValue && !selectedValue && !neverEmpty) {
       updateState({...state, selected: null, searchQuery: ''})
     } else if (selectedValue) {
-      updateState({...state, selected: selectedValue})
+      let level: string | number | null = state.level;
+      let parent : string | number | null = state.parent;
+      if (selectedValue.level !== null) {
+        const levelIndex = levels.findIndex(d => d.level === selectedValue.level);
+        if (levelIndex < levels.length - 1) {
+          level = levels[levelIndex + 1].level;
+          parent = selectedValue.id;
+        }
+      }
+      updateState({...state, selected: selectedValue, level, parent})
     }
   }, [selectedValue, previousSelectedValue]);
 
