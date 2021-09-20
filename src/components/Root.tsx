@@ -510,6 +510,9 @@ export default (props: Props) => {
           keywordMatch = false;
           keywordResultElm = null;
         }
+        if (datum.always_show) {
+          keywordMatch = true;
+        }
         if (!renderedIds.includes(datum.id) &&
             (datum.title.toLowerCase().includes(state.searchQuery.toLowerCase()) || keywordMatch) && (
               !maxResults || renderedIds.length < maxResults

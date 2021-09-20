@@ -50,6 +50,7 @@ interface NaicsDatum {
   parent_code: string | null;
   code_hierarchy: string;
   naics_id_hierarchy: string;
+  always_show: boolean | undefined;
 }
 
 const rawData: NaicsDatum[] = JSON.parse(raw('./naics_data.json'));
@@ -79,6 +80,7 @@ const App = () => {
       level: datum.level,
       parent_id: datum.parent_id,
       keywords,
+      always_show: datum.always_show,
     }
   })
 

@@ -21,6 +21,8 @@ export interface Datum {
   parent_id: number | string | null;
   // optional keywords will also be searched
   keywords?: string[];
+  // if always_show is true it will always show in the search results
+  always_show?: boolean;
 }
 
 // Levels are groupings of all datum
